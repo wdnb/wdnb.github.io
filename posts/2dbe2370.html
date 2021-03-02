@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="指针数组结合性int(*p)[4];------ptr为指向含4个元素的一维整形数组的指针变量（是指针） int *p[4];-------定义指针数组p，它由4个指向整型数据的指针元素组成（是数组） int(*)[4];--------实际上可以看作是一种数据类型。也就是第一个（int(*p)[4];）中定义的p的数据类型 其实你要看这种到底是什么，就是要看他最先和谁结合。 比如1中p先与*结合">
+<meta property="og:type" content="article">
+<meta property="og:title" content="c语言基础">
+<meta property="og:url" content="http://yoursite.com/posts/2dbe2370.html">
+<meta property="og:site_name" content="Faceless Void">
+<meta property="og:description" content="指针数组结合性int(*p)[4];------ptr为指向含4个元素的一维整形数组的指针变量（是指针） int *p[4];-------定义指针数组p，它由4个指向整型数据的指针元素组成（是数组） int(*)[4];--------实际上可以看作是一种数据类型。也就是第一个（int(*p)[4];）中定义的p的数据类型 其实你要看这种到底是什么，就是要看他最先和谁结合。 比如1中p先与*结合">
+<meta property="og:locale">
+<meta property="article:published_time" content="2015-06-13T18:57:22.000Z">
+<meta property="article:modified_time" content="2021-03-02T13:39:12.615Z">
+<meta property="article:author" content="第三选">
+<meta property="article:tag" content="c">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/posts/2dbe2370.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'default'
+  };
+</script>
+
+  <title>c语言基础 | Faceless Void</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Faceless Void</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="default">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/posts/2dbe2370.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="第三选">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Faceless Void">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          c语言基础
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2015-06-13 18:57:22" itemprop="dateCreated datePublished" datetime="2015-06-13T18:57:22+00:00">2015-06-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-02 13:39:12" itemprop="dateModified" datetime="2021-03-02T13:39:12+00:00">2021-03-02</time>
+              </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus: </span>
+    
+    <a title="disqus" href="/posts/2dbe2370.html#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="posts/2dbe2370.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="指针数组结合性"><a href="#指针数组结合性" class="headerlink" title="指针数组结合性"></a>指针数组结合性</h2><pre><code>int(*p)[4];------ptr为指向含4个元素的一维整形数组的指针变量（是指针）
+int *p[4];-------定义指针数组p，它由4个指向整型数据的指针元素组成（是数组）
+int(*)[4];--------实际上可以看作是一种数据类型。也就是第一个（int(*p)[4];）中定义的p的数据类型
+其实你要看这种到底是什么，就是要看他最先和谁结合。 比如1中p先与*结合，那就说明p本质是一个指针；而2中p先与后面的[4]结合，说明他本质是一个数组。
+</code></pre>
+<h2 id="随机数"><a href="#随机数" class="headerlink" title="随机数"></a>随机数</h2><pre><code>srand（（int）time（NULL））；设定随机数种子
+rand()%100；产生0-99的随机数。高级点的，假如要产生16-59之间的数，你可以这样写：rand（）%44+16（这里44由59-16+1得到）。
+</code></pre>
+<h2 id="0与NULL的区别"><a href="#0与NULL的区别" class="headerlink" title="0与NULL的区别"></a>0与NULL的区别</h2><p>通常 ‘\0’和NULL的值都是0。但他们各自代表的含义不同。判断字符串结尾时，用’\0’。判断指针，用NULL。不要混用。</p>
+<p>参考：</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="http://bbs.csdn.net/topics/370159675">http://bbs.csdn.net/topics/370159675</a></p>
+</blockquote>
+<h2 id="int-a-10-和-int-a-10-的区别"><a href="#int-a-10-和-int-a-10-的区别" class="headerlink" title="int (a)[10] 和 int a[10] 的区别"></a>int (a)[10] 和 int a[10] 的区别</h2><pre><code>理解声明有一条很简单的法则，不过不是什么“从左向右”这种没道理却到处宣传的法则。这一法则的观点是，一个声明是要告诉你，你所声明的对象要如何使用。例如：
+
+int *p; /* *p是int类型的, 因此p是指向int类型的指针 */
+int a[5]; /* a[0], ..., a[4] 是int类型的, 因此a是int类型的数组 */
+int *ap[5]; /* *ap[0], .., *ap[4] 是int类型的, 因此ap是包含指向int类型指针的指针数组 */
+int (*pa)[5]; /* (*pa)[0], ..., (*pa)[4] 是int类型的, 因此pa是指向一个int类型数组的指针 */
+
+
+指针数组：首先它是一个数组，数组的元素都是指针，数组占多少个字节由数组本身决定。它是“储存指针的数组”的简称。
+数组指针：首先它是一个指针，它指向一个数组。在32 位系统下永远是占4 个字节，至于它指向的数组占多少字节，不知道。它是“指向数组的指针”的简称。
+</code></pre>
+<h2 id="strlen"><a href="#strlen" class="headerlink" title="strlen"></a>strlen</h2><pre><code>char str[20]=&quot;0123456789&quot;;
+int a=strlen(str); //a=10; &gt;&gt;&gt;&gt; strlen 计算字符串的长度，以结束符 0x00 为字符串结束。
+int b=sizeof(str); //而b=20; &gt;&gt;&gt;&gt; sizeof 计算的则是分配的数组 str[20] 所占的内存空间的大小，不受里面存储的内容改变。  
+！！！计算\0！！！
+</code></pre>
+<h2 id="单目，条件，赋值，右结合-其余都为左结合"><a href="#单目，条件，赋值，右结合-其余都为左结合" class="headerlink" title="单目，条件，赋值，右结合(其余都为左结合)"></a>单目，条件，赋值，右结合(其余都为左结合)</h2><h2 id="缓存清除器"><a href="#缓存清除器" class="headerlink" title="缓存清除器"></a>缓存清除器</h2><pre><code>while(c=getchar()!=&#39;\n&#39;)
+</code></pre>
+<h2 id="结构体在内存中的对齐规则"><a href="#结构体在内存中的对齐规则" class="headerlink" title="结构体在内存中的对齐规则"></a>结构体在内存中的对齐规则</h2><pre><code>元素放置的位置一定会在自己宽度的整数倍上开始
+检查计算出的存储单元是否为所有元素中最宽的元素的长度的整数倍，是，则结束；若不是，则补齐为它的整数倍。(末尾添加)
+</code></pre>
+<p>参考： </p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="http://blog.csdn.net/liukun321/article/details/6974282">http://blog.csdn.net/liukun321/article/details/6974282</a></p>
+</blockquote>
+<h2 id="数据在内存中的存储位置"><a href="#数据在内存中的存储位置" class="headerlink" title="数据在内存中的存储位置"></a>数据在内存中的存储位置</h2><pre><code>C/C++
+一个由C/C++编译的程序占用的内存分为以下几个部分
+1、栈区（stack）— 由编译器自动分配释放 ，存放函数的参数名，局部变量的名等。其操作方式类似于数据结构中的栈。
+2、堆区（heap）— 由程序员分配释放， 若程序员不释放，程序结束时可能由OS回收。注意它与数据结构中的堆是两回事，分配方式倒是类似于链表。
+3、全局区（静态区）（static）—全局变量和静态变量的存储是放在一块的，初始化的全局变量和静态变量在一块区域， 未初始化的全局变量和未初始化的静态变量在相邻的另一块区域。程序结束后由系统释放。
+4、文字常量区—常量字符串就是放在这里的，程序结束后由系统释放 。
+5、程序代码区— 存放函数体的二进制代码。
+例子程序
+这是一个前辈写的，非常详细
+
+//main.cpp
+inta=0;//全局初始化区
+char*p1;//全局未初始化区
+main()
+&#123;
+intb;//栈
+chars[]=&quot;abc&quot;;//栈
+char*p2;//栈
+char*p3=&quot;123456&quot;;//123456\0在常量区，p3在栈上。
+staticintc=0;//全局（静态）初始化区
+p1=(char*)malloc(10);
+p2=(char*)malloc(20);//分配得来的10和20字节的区域就在堆区。
+&#125;
+strcpy(p1, &quot;123456&quot;); 123456\0放在常量区，编译器可能会将它与p3所指向的&quot;123456&quot;优化成一个地方。
+</code></pre>
+<h2 id="与或非"><a href="#与或非" class="headerlink" title="与或非"></a>与或非</h2><pre><code>真真得真（与运算），假假得假（或运算），同假异真（异或运算）。
+
+与 
+0&amp;&amp;0 =0 
+1&amp;&amp;0 =0 
+0&amp;&amp;1 =0 
+1&amp;&amp;1 =1 
+或 
+0||0 =0 
+1||0 =1 
+0||1 =1 
+1||1 =1 
+非 
+~1 =0 
+~0 =1 
+1100和1000按位与运算结果是 1000
+</code></pre>
+<h2 id="指针类型指针指向类型-1操作移动字节数"><a href="#指针类型指针指向类型-1操作移动字节数" class="headerlink" title="指针类型指针指向类型(+1操作移动字节数)"></a>指针类型指针指向类型(+1操作移动字节数)</h2><pre><code>指针是一个特殊的变量，它里面存储的数值被解释成为内存里的一个地址。 要搞清一个指针需要搞清指针的四方面的内容：指针的类型，指针所指向的 类型，指针的值或者叫指针所指向的内存区，还有指针本身所占据的内存区。让我们分别说明。 
+　　先声明几个指针放着做例子： 
+　　例一： 
+　　(1)int*ptr; 
+　　(2)char*ptr; 
+　　(3)int**ptr; 
+　　(4)int(*ptr)[3]; 
+　　(5)int*(*ptr)[4]; 
+　　 
+　　指针的类型 
+　　从语法的角度看，你只要把指针声明语句里的指针名字去掉，剩下的部分就是这个指针的类型。这是指针本身所具有的类型。让我们看看例一中各个指针的类型： 
+　　(1)int*ptr;//指针的类型是int* 
+　　(2)char*ptr;//指针的类型是char* 
+　　(3)int**ptr;//指针的类型是int** 
+　　(4)int(*ptr)[3];//指针的类型是int(*)[3] 
+　　(5)int*(*ptr)[4];//指针的类型是int*(*)[4] 
+　　怎么样？找出指针的类型的方法是不是很简单？ 
+　　指针所指向的类型 
+　　当你通过指针来访问指针所指向的内存区时，指针所指向的类型决定了编译器将把那片内存区里的内容当做什么来看待。 
+　　从语法上看，你只须把指针声明语句中的指针名字和名字左边的指针声明符*去掉，剩下的就是指针所指向的类型。例如： 
+　　(1)int*ptr;//指针所指向的类型是int 
+　　(2)char*ptr;//指针所指向的的类型是char 
+　　(3)int**ptr;//指针所指向的的类型是int* 
+　　(4)int(*ptr)[3];//指针所指向的的类型是int()[3] 
+　　(5)int*(*ptr)[4];//指针所指向的的类型是int*()[4] 
+　　在指针的算术运算中，指针所指向的类型有很大的作用。 
+　　指针的类型(即指针本身的类型)和指针所指向的类型是两个概念。当你对C越来越熟悉时，你会发现，把与指针搅和在一起的 &quot;类型 &quot;这个概念分成 &quot;指针的类型 &quot;和 &quot;指针所指向的类型 &quot;两个概念，是精通指针的关键点之一。我看了不少书，发现有些写得差的书中，就把指针的这两个概念搅在一起了，所以看起书来前后矛盾，越看越糊涂。 
+指针的值，或者叫指针所指向的内存区或地址 
+　　指针的值是指针本身存储的数值，这个值将被编译器当作一个地址，而不是一个一般的数值。在32位程序里，所有类型的指针的值都是一个32位整数，因为32位程序里内存地址全都是32位长。 指针所指向的内存区就是从指针的值所代表的那个内存地址开始，长度为si zeof(指针所指向的类型)的一片内存区。以后，我们说一个指针的值是XX，就相当于说该指针指向了以XX为首地址的一片内存区域；我们说一个指针指向了某块内存区域，就相当于说该指针的值是这块内存区域的首地址。 
+　　指针所指向的内存区和指针所指向的类型是两个完全不同的概念。在例一中，指针所指向的类型已经有了，但由于指针还未初始化，所以它所指向的内存区是不存在的，或者说是无意义的。 
+　　以后，每遇到一个指针，都应该问问：这个指针的类型是什么？指针指的类型是什么？该指针指向了哪里？ 
+　　指针本身所占据的内存区 
+　　指针本身占了多大的内存？你只要用函数sizeof(指针的类型)测一下就知道了。在32位平台里，指针本身占据了4个字节的长度。 
+　　指针本身占据的内存这个概念在判断一个指针表达式是否是左值时很有用。 
+　　指针的算术运算 
+指针可以加上或减去一个整数。指针的这种运算的意义和通常的数值的加减运算的意义是不一样的。例如： 
+　　例二： 
+　　1、chara[20]; 
+　　2、int*ptr=a; 
+　　... 
+　... 
+　　3、ptr++; 
+　　在上例中，指针ptr的类型是int*,它指向的类型是int，它被初始化为指向整形变量a。接下来的第3句中，指针ptr被加了1，编译器是这样处理的：它把指针ptr的值加上了sizeof(int)，在32位程序中，是被加上了4。由于地址是用字节做单位的，故ptr所指向的地址由原来的变量a的地址向高地址方向增加了4个字节。 
+由于char类型的长度是一个字节，所以，原来ptr是指向数组a的第0号单元开始的四个字节，此时指向了数组a中从第4号单元开始的四个字节。 
+　　我们可以用一个指针和一个循环来遍历一个数组，看例子： 
+　　例三： 
+intarray[20]; 
+int*ptr=array; 
+... 
+//此处略去为整型数组赋值的代码。 
+... 
+for(i=0;i &lt;20;i++) 
+&#123; 
+　(*ptr)++; 
+　ptr++； 
+&#125; 
+　　这个例子将整型数组中各个单元的值加1。由于每次循环都将指针ptr加1，所以每次循环都能访问数组的下一个单元。 
+
+　　再看例子： 
+
+　　例四： 
+
+　　1、chara[20]; 
+　　2、int*ptr=a; 
+　　... 
+　　... 
+　　3、ptr+=5; 
+　　在这个例子中，ptr被加上了5，编译器是这样处理的：将指针ptr的值加上5乘sizeof(int)，在32位程序中就是加上了5乘4=20。由于地址的单位是字节，故现在的ptr所指向的地址比起加5后的ptr所指向的地址来说，向高地址方向移动了20个字节。在这个例子中，没加5前的ptr指向数组a的第0号单元开始的四个字节，加5后，ptr已经指向了数组a的合法范围之外了。虽然这种情况在应用上会出问题，但在语法上却是可以的。这也体现出了指针的灵活性。
+</code></pre>
+<p>参考：</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="http://tieba.baidu.com/p/1760590296">http://tieba.baidu.com/p/1760590296</a></p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/c/" rel="tag"># c</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/367c0bbd.html" rel="prev" title="centos安装nodejs">
+      <i class="fa fa-chevron-left"></i> centos安装nodejs
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/7f3cca4f.html" rel="next" title="linux常用指令">
+      linux常用指令 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%87%E9%92%88%E6%95%B0%E7%BB%84%E7%BB%93%E5%90%88%E6%80%A7"><span class="nav-number">1.</span> <span class="nav-text">指针数组结合性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9A%8F%E6%9C%BA%E6%95%B0"><span class="nav-number">2.</span> <span class="nav-text">随机数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0%E4%B8%8ENULL%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">3.</span> <span class="nav-text">0与NULL的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#int-a-10-%E5%92%8C-int-a-10-%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">4.</span> <span class="nav-text">int (a)[10] 和 int a[10] 的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#strlen"><span class="nav-number">5.</span> <span class="nav-text">strlen</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%95%E7%9B%AE%EF%BC%8C%E6%9D%A1%E4%BB%B6%EF%BC%8C%E8%B5%8B%E5%80%BC%EF%BC%8C%E5%8F%B3%E7%BB%93%E5%90%88-%E5%85%B6%E4%BD%99%E9%83%BD%E4%B8%BA%E5%B7%A6%E7%BB%93%E5%90%88"><span class="nav-number">6.</span> <span class="nav-text">单目，条件，赋值，右结合(其余都为左结合)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E6%B8%85%E9%99%A4%E5%99%A8"><span class="nav-number">7.</span> <span class="nav-text">缓存清除器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E6%9E%84%E4%BD%93%E5%9C%A8%E5%86%85%E5%AD%98%E4%B8%AD%E7%9A%84%E5%AF%B9%E9%BD%90%E8%A7%84%E5%88%99"><span class="nav-number">8.</span> <span class="nav-text">结构体在内存中的对齐规则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%9C%A8%E5%86%85%E5%AD%98%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8%E4%BD%8D%E7%BD%AE"><span class="nav-number">9.</span> <span class="nav-text">数据在内存中的存储位置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8E%E6%88%96%E9%9D%9E"><span class="nav-number">10.</span> <span class="nav-text">与或非</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%87%E9%92%88%E7%B1%BB%E5%9E%8B%E6%8C%87%E9%92%88%E6%8C%87%E5%90%91%E7%B1%BB%E5%9E%8B-1%E6%93%8D%E4%BD%9C%E7%A7%BB%E5%8A%A8%E5%AD%97%E8%8A%82%E6%95%B0"><span class="nav-number">11.</span> <span class="nav-text">指针类型指针指向类型(+1操作移动字节数)</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">第三选</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">69</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">32</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">第三选</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://blog-kh2xumfqa3.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://yoursite.com/posts/2dbe2370.html";
+    this.page.identifier = "posts/2dbe2370.html";
+    this.page.title = "c语言基础";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://blog-kh2xumfqa3.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>

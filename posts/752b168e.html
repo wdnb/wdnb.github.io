@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="kubectl 指令查看k3s节点sudo k3s kubectl get nodes 查看k3s节点详细kubectl get nodes -o wide 查看所有namespacekubectl get pods --all-namespaces 删除 namespacekubectl delete namespaces cattle-system helm 指令k3s指令重启k3ssudo">
+<meta property="og:type" content="article">
+<meta property="og:title" content="k3s配置">
+<meta property="og:url" content="http://yoursite.com/posts/752b168e.html">
+<meta property="og:site_name" content="Faceless Void">
+<meta property="og:description" content="kubectl 指令查看k3s节点sudo k3s kubectl get nodes 查看k3s节点详细kubectl get nodes -o wide 查看所有namespacekubectl get pods --all-namespaces 删除 namespacekubectl delete namespaces cattle-system helm 指令k3s指令重启k3ssudo">
+<meta property="og:locale">
+<meta property="article:published_time" content="2020-07-29T23:37:22.000Z">
+<meta property="article:modified_time" content="2021-03-02T13:39:12.625Z">
+<meta property="article:author" content="第三选">
+<meta property="article:tag" content="树莓派">
+<meta property="article:tag" content="k3s">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/posts/752b168e.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'default'
+  };
+</script>
+
+  <title>k3s配置 | Faceless Void</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Faceless Void</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="default">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/posts/752b168e.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="第三选">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Faceless Void">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          k3s配置
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-07-29 23:37:22" itemprop="dateCreated datePublished" datetime="2020-07-29T23:37:22+00:00">2020-07-29</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-02 13:39:12" itemprop="dateModified" datetime="2021-03-02T13:39:12+00:00">2021-03-02</time>
+              </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus: </span>
+    
+    <a title="disqus" href="/posts/752b168e.html#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="posts/752b168e.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="kubectl-指令"><a href="#kubectl-指令" class="headerlink" title="kubectl 指令"></a>kubectl 指令</h2><h3 id="查看k3s节点"><a href="#查看k3s节点" class="headerlink" title="查看k3s节点"></a>查看k3s节点</h3><p><code>sudo k3s kubectl get nodes</code></p>
+<h3 id="查看k3s节点详细"><a href="#查看k3s节点详细" class="headerlink" title="查看k3s节点详细"></a>查看k3s节点详细</h3><p><code>kubectl get nodes -o wide</code></p>
+<h3 id="查看所有namespace"><a href="#查看所有namespace" class="headerlink" title="查看所有namespace"></a>查看所有namespace</h3><p><code>kubectl get pods --all-namespaces</code></p>
+<h3 id="删除-namespace"><a href="#删除-namespace" class="headerlink" title="删除 namespace"></a>删除 namespace</h3><p><code>kubectl delete namespaces cattle-system</code></p>
+<h2 id="helm-指令"><a href="#helm-指令" class="headerlink" title="helm 指令"></a>helm 指令</h2><h2 id="k3s指令"><a href="#k3s指令" class="headerlink" title="k3s指令"></a>k3s指令</h2><h3 id="重启k3s"><a href="#重启k3s" class="headerlink" title="重启k3s"></a>重启k3s</h3><p><code>sudo systemctl restart k3s</code></p>
+<h3 id="卸载k3s"><a href="#卸载k3s" class="headerlink" title="卸载k3s"></a>卸载k3s</h3><p><code>/usr/local/bin/k3s-uninstall.sh (or as k3s-agent-uninstall.sh)</code></p>
+<h2 id="树莓派安装k3s前准备配置"><a href="#树莓派安装k3s前准备配置" class="headerlink" title="树莓派安装k3s前准备配置"></a>树莓派安装k3s前准备配置</h2><h3 id="Raspbian-Buster-需要使用-legacy-iptables"><a href="#Raspbian-Buster-需要使用-legacy-iptables" class="headerlink" title="Raspbian Buster 需要使用 legacy iptables"></a>Raspbian Buster 需要使用 legacy iptables</h3><p>参考官方文档进行操作</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://rancher.com/docs/k3s/latest/en/advanced/#enabling-legacy-iptables-on-raspbian-buster">https://rancher.com/docs/k3s/latest/en/advanced/#enabling-legacy-iptables-on-raspbian-buster</a></p>
+</blockquote>
+<p>Could not set up iptables canary mangle/KUBE-KUBELET-CANARY: error creating chain “KUBE-KUBELET-CANARY”: exit status 3: iptables v1.8.3 (legacy): can’t initialize iptables table `mangle’: Table does not exist (do you need to insmod?)</p>
+<h2 id="修改树莓派主机名"><a href="#修改树莓派主机名" class="headerlink" title="修改树莓派主机名"></a>修改树莓派主机名</h2><p>所有节点不能具有相同的主机名</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://blog.jbface.com/posts/cfe260ea.html#%E6%B7%BB%E5%8A%A0hosts%E5%9F%9F%E5%90%8D%E5%92%8Cip%E5%AF%B9%E5%BA%94%E5%85%B3%E7%B3%BB">https://blog.jbface.com/posts/cfe260ea.html#%E6%B7%BB%E5%8A%A0hosts%E5%9F%9F%E5%90%8D%E5%92%8Cip%E5%AF%B9%E5%BA%94%E5%85%B3%E7%B3%BB</a></p>
+</blockquote>
+<h3 id="cgroup设置"><a href="#cgroup设置" class="headerlink" title="cgroup设置"></a>cgroup设置</h3><p>Jul 27 14:55:53 raspberrypi k3s[849]: time=”2020-07-27T14:55:53.565642894+01:00” level=error msg=”Failed to find memory cgroup, you may need to add &quot;cgroup_memory=1 cgroup_enable=memory&quot; to your linux cmdline (/boot/cmdline.txt on a Raspberry Pi)”</p>
+<h4 id="编辑-boot-cmdline-txt"><a href="#编辑-boot-cmdline-txt" class="headerlink" title="编辑/boot/cmdline.txt"></a>编辑/boot/cmdline.txt</h4><p><code>sudo vim /boot/cmdline.txt</code> 增加 cgroup_memory=1 cgroup_enable=memory 并重启系统</p>
+<p><code>cat /proc/cmdline | grep cgroup_memory</code> 看是否有cgroup_memory字段</p>
+<p><code>cat /proc/self/cgroup</code> 看有没有memory 字段</p>
+<p>这里注意！当前时间：2020/07/27<br>树莓派3b用的Raspbian不支持内存 cgroup<br>参照这个issue</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://github.com/raspberrypi/linux/issues/3644">https://github.com/raspberrypi/linux/issues/3644</a></p>
+</blockquote>
+<p>用老版内核解决</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">wget http:&#x2F;&#x2F;archive.raspberrypi.org&#x2F;debian&#x2F;pool&#x2F;main&#x2F;r&#x2F;raspberrypi-firmware&#x2F;raspberrypi-bootloader_1.20200601-1_armhf.deb</span><br><span class="line">wget http:&#x2F;&#x2F;archive.raspberrypi.org&#x2F;debian&#x2F;pool&#x2F;main&#x2F;r&#x2F;raspberrypi-firmware&#x2F;raspberrypi-kernel_1.20200601-1_armhf.deb</span><br><span class="line">wget http:&#x2F;&#x2F;archive.raspberrypi.org&#x2F;debian&#x2F;pool&#x2F;main&#x2F;r&#x2F;raspberrypi-firmware&#x2F;libraspberrypi-bin_1.20200601-1_armhf.deb</span><br><span class="line">wget http:&#x2F;&#x2F;archive.raspberrypi.org&#x2F;debian&#x2F;pool&#x2F;main&#x2F;r&#x2F;raspberrypi-firmware&#x2F;libraspberrypi-dev_1.20200601-1_armhf.deb</span><br><span class="line">wget http:&#x2F;&#x2F;archive.raspberrypi.org&#x2F;debian&#x2F;pool&#x2F;main&#x2F;r&#x2F;raspberrypi-firmware&#x2F;libraspberrypi-doc_1.20200601-1_armhf.deb</span><br><span class="line">wget http:&#x2F;&#x2F;archive.raspberrypi.org&#x2F;debian&#x2F;pool&#x2F;main&#x2F;r&#x2F;raspberrypi-firmware&#x2F;libraspberrypi0_1.20200601-1_armhf.deb</span><br><span class="line">sudo dpkg -i *deb</span><br></pre></td></tr></table></figure>
+
+<h3 id="执行kubectl时加载配置文件-etc-rancher-k3s-k3s-yaml-时没有权限"><a href="#执行kubectl时加载配置文件-etc-rancher-k3s-k3s-yaml-时没有权限" class="headerlink" title="执行kubectl时加载配置文件 /etc/rancher/k3s/k3s.yaml 时没有权限"></a>执行kubectl时加载配置文件 /etc/rancher/k3s/k3s.yaml 时没有权限</h3><p>WARN[2020-07-26T10:27:21.868999680+01:00] Unable to read /etc/rancher/k3s/k3s.yaml, please start server with –write-kubeconfig-mode to modify kube config permissions </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo su</span><br><span class="line">echo &quot;K3S_KUBECONFIG_MODE&#x3D;\&quot;644\&quot;&quot; &gt;&gt; &#x2F;etc&#x2F;systemd&#x2F;system&#x2F;k3s.service.env</span><br><span class="line">sudo systemctl restart k3s</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="helm-install-报错-Error-Kubernetes-cluster-unreachable"><a href="#helm-install-报错-Error-Kubernetes-cluster-unreachable" class="headerlink" title="helm install 报错 Error: Kubernetes cluster unreachable"></a>helm install 报错 Error: Kubernetes cluster unreachable</h3><p>执行<br><code>export KUBECONFIG=/etc/rancher/k3s/k3s.yaml</code></p>
+<h2 id="Inbound-Rules-for-K3s-Server-Nodes"><a href="#Inbound-Rules-for-K3s-Server-Nodes" class="headerlink" title="Inbound Rules for K3s Server Nodes"></a>Inbound Rules for K3s Server Nodes</h2><table>
+<thead>
+<tr>
+<th>PROTOCOL</th>
+<th>PORT</th>
+<th>SOURCE</th>
+<th>DESCRIPTION</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>TCP</td>
+<td>6443</td>
+<td>K3s agent nodes</td>
+<td>Kubernetes API</td>
+</tr>
+<tr>
+<td>UDP</td>
+<td>8472</td>
+<td>K3s server and agent nodes</td>
+<td>Required only for Flannel VXLAN</td>
+</tr>
+<tr>
+<td>TCP</td>
+<td>10250</td>
+<td>K3s server and agent nodes</td>
+<td>kubelet</td>
+</tr>
+</tbody></table>
+<h2 id="设置国内加速镜像"><a href="#设置国内加速镜像" class="headerlink" title="设置国内加速镜像"></a>设置国内加速镜像</h2><h3 id="查看镜像信息"><a href="#查看镜像信息" class="headerlink" title="查看镜像信息"></a>查看镜像信息</h3><p><code>crictl info | grep registry</code></p>
+<p>k3s 会在目录 /var/lib/rancher/k3s/agent/etc/containerd 下创建一个 config.toml 文件作为 containerd 的配置文件，我们要做的就是，在同目录下把这个文件复制出来一个 config.toml.tmpl 文件，然后添加镜像源相关的配置进去</p>
+<p><code>sudo cp /var/lib/rancher/k3s/agent/etc/containerd/config.toml /var/lib/rancher/k3s/agent/etc/containerd/config.toml.tmpl</code><br><code>sudo vim /var/lib/rancher/k3s/agent/etc/containerd/config.toml.tmpl</code></p>
+<h3 id="在-config-toml-tmpl-文件中添加"><a href="#在-config-toml-tmpl-文件中添加" class="headerlink" title="在 config.toml.tmpl 文件中添加"></a>在 config.toml.tmpl 文件中添加</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[plugins.cri.registry.mirrors]</span><br><span class="line">  [plugins.cri.registry.mirrors.&quot;docker.io&quot;]</span><br><span class="line">    endpoint &#x3D; [&quot;https:&#x2F;&#x2F;docker.mirrors.ustc.edu.cn&quot;]</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="重启服务"><a href="#重启服务" class="headerlink" title="重启服务"></a>重启服务</h3><p>重启后生效<br><code>systemctl restart k3s</code></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%A0%91%E8%8E%93%E6%B4%BE/" rel="tag"># 树莓派</a>
+              <a href="/tags/k3s/" rel="tag"># k3s</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/480df2b4.html" rel="prev" title="树莓派部署k3s">
+      <i class="fa fa-chevron-left"></i> 树莓派部署k3s
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/e6a6fd56.html" rel="next" title="mariadb配置">
+      mariadb配置 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#kubectl-%E6%8C%87%E4%BB%A4"><span class="nav-number">1.</span> <span class="nav-text">kubectl 指令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8Bk3s%E8%8A%82%E7%82%B9"><span class="nav-number">1.1.</span> <span class="nav-text">查看k3s节点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8Bk3s%E8%8A%82%E7%82%B9%E8%AF%A6%E7%BB%86"><span class="nav-number">1.2.</span> <span class="nav-text">查看k3s节点详细</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E6%89%80%E6%9C%89namespace"><span class="nav-number">1.3.</span> <span class="nav-text">查看所有namespace</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A0%E9%99%A4-namespace"><span class="nav-number">1.4.</span> <span class="nav-text">删除 namespace</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#helm-%E6%8C%87%E4%BB%A4"><span class="nav-number">2.</span> <span class="nav-text">helm 指令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#k3s%E6%8C%87%E4%BB%A4"><span class="nav-number">3.</span> <span class="nav-text">k3s指令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%87%8D%E5%90%AFk3s"><span class="nav-number">3.1.</span> <span class="nav-text">重启k3s</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%B8%E8%BD%BDk3s"><span class="nav-number">3.2.</span> <span class="nav-text">卸载k3s</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%91%E8%8E%93%E6%B4%BE%E5%AE%89%E8%A3%85k3s%E5%89%8D%E5%87%86%E5%A4%87%E9%85%8D%E7%BD%AE"><span class="nav-number">4.</span> <span class="nav-text">树莓派安装k3s前准备配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Raspbian-Buster-%E9%9C%80%E8%A6%81%E4%BD%BF%E7%94%A8-legacy-iptables"><span class="nav-number">4.1.</span> <span class="nav-text">Raspbian Buster 需要使用 legacy iptables</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9%E6%A0%91%E8%8E%93%E6%B4%BE%E4%B8%BB%E6%9C%BA%E5%90%8D"><span class="nav-number">5.</span> <span class="nav-text">修改树莓派主机名</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#cgroup%E8%AE%BE%E7%BD%AE"><span class="nav-number">5.1.</span> <span class="nav-text">cgroup设置</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%96%E8%BE%91-boot-cmdline-txt"><span class="nav-number">5.1.1.</span> <span class="nav-text">编辑&#x2F;boot&#x2F;cmdline.txt</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%A7%E8%A1%8Ckubectl%E6%97%B6%E5%8A%A0%E8%BD%BD%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6-etc-rancher-k3s-k3s-yaml-%E6%97%B6%E6%B2%A1%E6%9C%89%E6%9D%83%E9%99%90"><span class="nav-number">5.2.</span> <span class="nav-text">执行kubectl时加载配置文件 &#x2F;etc&#x2F;rancher&#x2F;k3s&#x2F;k3s.yaml 时没有权限</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#helm-install-%E6%8A%A5%E9%94%99-Error-Kubernetes-cluster-unreachable"><span class="nav-number">5.3.</span> <span class="nav-text">helm install 报错 Error: Kubernetes cluster unreachable</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Inbound-Rules-for-K3s-Server-Nodes"><span class="nav-number">6.</span> <span class="nav-text">Inbound Rules for K3s Server Nodes</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E7%BD%AE%E5%9B%BD%E5%86%85%E5%8A%A0%E9%80%9F%E9%95%9C%E5%83%8F"><span class="nav-number">7.</span> <span class="nav-text">设置国内加速镜像</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E9%95%9C%E5%83%8F%E4%BF%A1%E6%81%AF"><span class="nav-number">7.1.</span> <span class="nav-text">查看镜像信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%A8-config-toml-tmpl-%E6%96%87%E4%BB%B6%E4%B8%AD%E6%B7%BB%E5%8A%A0"><span class="nav-number">7.2.</span> <span class="nav-text">在 config.toml.tmpl 文件中添加</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%87%8D%E5%90%AF%E6%9C%8D%E5%8A%A1"><span class="nav-number">7.3.</span> <span class="nav-text">重启服务</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">第三选</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">69</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">32</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">第三选</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://blog-kh2xumfqa3.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://yoursite.com/posts/752b168e.html";
+    this.page.identifier = "posts/752b168e.html";
+    this.page.title = "k3s配置";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://blog-kh2xumfqa3.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>

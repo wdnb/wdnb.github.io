@@ -1,0 +1,2402 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>EmbedSky交叉编译</title>
+    <url>/posts/5a4fce46.html</url>
+    <content><![CDATA[<p>1.编译前准备</p>
+<p>解压缩    </p>
+<pre><code>tar xfv 文件名
+</code></pre>
+<p>编译交叉编译工具需要以下目录</p>
+<pre><code>u-boot-1.1.6 crosstools_3.4.5_softfloat
+</code></pre>
+<p>进入u-boot-1.1.6修改第128行的Makefile 交叉编译工具路径</p>
+<pre><code>CROSS_COMPILE = /home/c/opt/EmbedSky/crosstools_3.4.5_softfloat/gcc-3.4.5-glibc-2.3.6/arm-linux/bin/arm-linux-
+</code></pre>
+<p>设置配置单</p>
+<pre><code>make EmbedSky_config
+make
+</code></pre>
+<p>make时修改目录出现寻找原路径问题使用</p>
+<pre><code>make distclean 
+</code></pre>
+<p>2.内核编译</p>
+<p>修改第194 行</p>
+<pre><code>export KBUILD_BUILDHOST := $(SUBARCH)
+ARCH            = arm
+CROSS_COMPILE   = /home/lierda/source/opt/EmbedSky/4.3.3/bin/arm-none-linux-gnueabi-
+
+
+cp config_EmbedSky_W43 .config
+</code></pre>
+<p>3.完成</p>
+<p>把usr目录下的mkyaff复制到用户sbin下</p>
+<pre><code>sudo cp mkyaffs2image /usr/local/sbin/
+</code></pre>
+<p>编译</p>
+<pre><code>mkyaffs2image root_TQ2440_PDA/ root_TQ2440
+</code></pre>
+]]></content>
+      <tags>
+        <tag>EmbedSky</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>c语言基础</title>
+    <url>/posts/2dbe2370.html</url>
+    <content><![CDATA[<h2 id="指针数组结合性"><a href="#指针数组结合性" class="headerlink" title="指针数组结合性"></a>指针数组结合性</h2><pre><code>int(*p)[4];------ptr为指向含4个元素的一维整形数组的指针变量（是指针）
+int *p[4];-------定义指针数组p，它由4个指向整型数据的指针元素组成（是数组）
+int(*)[4];--------实际上可以看作是一种数据类型。也就是第一个（int(*p)[4];）中定义的p的数据类型
+其实你要看这种到底是什么，就是要看他最先和谁结合。 比如1中p先与*结合，那就说明p本质是一个指针；而2中p先与后面的[4]结合，说明他本质是一个数组。
+</code></pre>
+<h2 id="随机数"><a href="#随机数" class="headerlink" title="随机数"></a>随机数</h2><pre><code>srand（（int）time（NULL））；设定随机数种子
+rand()%100；产生0-99的随机数。高级点的，假如要产生16-59之间的数，你可以这样写：rand（）%44+16（这里44由59-16+1得到）。
+</code></pre>
+<h2 id="0与NULL的区别"><a href="#0与NULL的区别" class="headerlink" title="0与NULL的区别"></a>0与NULL的区别</h2><p>通常 ‘\0’和NULL的值都是0。但他们各自代表的含义不同。判断字符串结尾时，用’\0’。判断指针，用NULL。不要混用。</p>
+<p>参考：</p>
+<blockquote>
+<p><a href="http://bbs.csdn.net/topics/370159675">http://bbs.csdn.net/topics/370159675</a></p>
+</blockquote>
+<h2 id="int-a-10-和-int-a-10-的区别"><a href="#int-a-10-和-int-a-10-的区别" class="headerlink" title="int (a)[10] 和 int a[10] 的区别"></a>int (a)[10] 和 int a[10] 的区别</h2><pre><code>理解声明有一条很简单的法则，不过不是什么“从左向右”这种没道理却到处宣传的法则。这一法则的观点是，一个声明是要告诉你，你所声明的对象要如何使用。例如：
+
+int *p; /* *p是int类型的, 因此p是指向int类型的指针 */
+int a[5]; /* a[0], ..., a[4] 是int类型的, 因此a是int类型的数组 */
+int *ap[5]; /* *ap[0], .., *ap[4] 是int类型的, 因此ap是包含指向int类型指针的指针数组 */
+int (*pa)[5]; /* (*pa)[0], ..., (*pa)[4] 是int类型的, 因此pa是指向一个int类型数组的指针 */
+
+
+指针数组：首先它是一个数组，数组的元素都是指针，数组占多少个字节由数组本身决定。它是“储存指针的数组”的简称。
+数组指针：首先它是一个指针，它指向一个数组。在32 位系统下永远是占4 个字节，至于它指向的数组占多少字节，不知道。它是“指向数组的指针”的简称。
+</code></pre>
+<h2 id="strlen"><a href="#strlen" class="headerlink" title="strlen"></a>strlen</h2><pre><code>char str[20]=&quot;0123456789&quot;;
+int a=strlen(str); //a=10; &gt;&gt;&gt;&gt; strlen 计算字符串的长度，以结束符 0x00 为字符串结束。
+int b=sizeof(str); //而b=20; &gt;&gt;&gt;&gt; sizeof 计算的则是分配的数组 str[20] 所占的内存空间的大小，不受里面存储的内容改变。  
+！！！计算\0！！！
+</code></pre>
+<h2 id="单目，条件，赋值，右结合-其余都为左结合"><a href="#单目，条件，赋值，右结合-其余都为左结合" class="headerlink" title="单目，条件，赋值，右结合(其余都为左结合)"></a>单目，条件，赋值，右结合(其余都为左结合)</h2><h2 id="缓存清除器"><a href="#缓存清除器" class="headerlink" title="缓存清除器"></a>缓存清除器</h2><pre><code>while(c=getchar()!=&#39;\n&#39;)
+</code></pre>
+<h2 id="结构体在内存中的对齐规则"><a href="#结构体在内存中的对齐规则" class="headerlink" title="结构体在内存中的对齐规则"></a>结构体在内存中的对齐规则</h2><pre><code>元素放置的位置一定会在自己宽度的整数倍上开始
+检查计算出的存储单元是否为所有元素中最宽的元素的长度的整数倍，是，则结束；若不是，则补齐为它的整数倍。(末尾添加)
+</code></pre>
+<p>参考： </p>
+<blockquote>
+<p><a href="http://blog.csdn.net/liukun321/article/details/6974282">http://blog.csdn.net/liukun321/article/details/6974282</a></p>
+</blockquote>
+<h2 id="数据在内存中的存储位置"><a href="#数据在内存中的存储位置" class="headerlink" title="数据在内存中的存储位置"></a>数据在内存中的存储位置</h2><pre><code>C/C++
+一个由C/C++编译的程序占用的内存分为以下几个部分
+1、栈区（stack）— 由编译器自动分配释放 ，存放函数的参数名，局部变量的名等。其操作方式类似于数据结构中的栈。
+2、堆区（heap）— 由程序员分配释放， 若程序员不释放，程序结束时可能由OS回收。注意它与数据结构中的堆是两回事，分配方式倒是类似于链表。
+3、全局区（静态区）（static）—全局变量和静态变量的存储是放在一块的，初始化的全局变量和静态变量在一块区域， 未初始化的全局变量和未初始化的静态变量在相邻的另一块区域。程序结束后由系统释放。
+4、文字常量区—常量字符串就是放在这里的，程序结束后由系统释放 。
+5、程序代码区— 存放函数体的二进制代码。
+例子程序
+这是一个前辈写的，非常详细
+
+//main.cpp
+inta=0;//全局初始化区
+char*p1;//全局未初始化区
+main()
+&#123;
+intb;//栈
+chars[]=&quot;abc&quot;;//栈
+char*p2;//栈
+char*p3=&quot;123456&quot;;//123456\0在常量区，p3在栈上。
+staticintc=0;//全局（静态）初始化区
+p1=(char*)malloc(10);
+p2=(char*)malloc(20);//分配得来的10和20字节的区域就在堆区。
+&#125;
+strcpy(p1, &quot;123456&quot;); 123456\0放在常量区，编译器可能会将它与p3所指向的&quot;123456&quot;优化成一个地方。
+</code></pre>
+<h2 id="与或非"><a href="#与或非" class="headerlink" title="与或非"></a>与或非</h2><pre><code>真真得真（与运算），假假得假（或运算），同假异真（异或运算）。
+
+与 
+0&amp;&amp;0 =0 
+1&amp;&amp;0 =0 
+0&amp;&amp;1 =0 
+1&amp;&amp;1 =1 
+或 
+0||0 =0 
+1||0 =1 
+0||1 =1 
+1||1 =1 
+非 
+~1 =0 
+~0 =1 
+1100和1000按位与运算结果是 1000
+</code></pre>
+<h2 id="指针类型指针指向类型-1操作移动字节数"><a href="#指针类型指针指向类型-1操作移动字节数" class="headerlink" title="指针类型指针指向类型(+1操作移动字节数)"></a>指针类型指针指向类型(+1操作移动字节数)</h2><pre><code>指针是一个特殊的变量，它里面存储的数值被解释成为内存里的一个地址。 要搞清一个指针需要搞清指针的四方面的内容：指针的类型，指针所指向的 类型，指针的值或者叫指针所指向的内存区，还有指针本身所占据的内存区。让我们分别说明。 
+　　先声明几个指针放着做例子： 
+　　例一： 
+　　(1)int*ptr; 
+　　(2)char*ptr; 
+　　(3)int**ptr; 
+　　(4)int(*ptr)[3]; 
+　　(5)int*(*ptr)[4]; 
+　　 
+　　指针的类型 
+　　从语法的角度看，你只要把指针声明语句里的指针名字去掉，剩下的部分就是这个指针的类型。这是指针本身所具有的类型。让我们看看例一中各个指针的类型： 
+　　(1)int*ptr;//指针的类型是int* 
+　　(2)char*ptr;//指针的类型是char* 
+　　(3)int**ptr;//指针的类型是int** 
+　　(4)int(*ptr)[3];//指针的类型是int(*)[3] 
+　　(5)int*(*ptr)[4];//指针的类型是int*(*)[4] 
+　　怎么样？找出指针的类型的方法是不是很简单？ 
+　　指针所指向的类型 
+　　当你通过指针来访问指针所指向的内存区时，指针所指向的类型决定了编译器将把那片内存区里的内容当做什么来看待。 
+　　从语法上看，你只须把指针声明语句中的指针名字和名字左边的指针声明符*去掉，剩下的就是指针所指向的类型。例如： 
+　　(1)int*ptr;//指针所指向的类型是int 
+　　(2)char*ptr;//指针所指向的的类型是char 
+　　(3)int**ptr;//指针所指向的的类型是int* 
+　　(4)int(*ptr)[3];//指针所指向的的类型是int()[3] 
+　　(5)int*(*ptr)[4];//指针所指向的的类型是int*()[4] 
+　　在指针的算术运算中，指针所指向的类型有很大的作用。 
+　　指针的类型(即指针本身的类型)和指针所指向的类型是两个概念。当你对C越来越熟悉时，你会发现，把与指针搅和在一起的 &quot;类型 &quot;这个概念分成 &quot;指针的类型 &quot;和 &quot;指针所指向的类型 &quot;两个概念，是精通指针的关键点之一。我看了不少书，发现有些写得差的书中，就把指针的这两个概念搅在一起了，所以看起书来前后矛盾，越看越糊涂。 
+指针的值，或者叫指针所指向的内存区或地址 
+　　指针的值是指针本身存储的数值，这个值将被编译器当作一个地址，而不是一个一般的数值。在32位程序里，所有类型的指针的值都是一个32位整数，因为32位程序里内存地址全都是32位长。 指针所指向的内存区就是从指针的值所代表的那个内存地址开始，长度为si zeof(指针所指向的类型)的一片内存区。以后，我们说一个指针的值是XX，就相当于说该指针指向了以XX为首地址的一片内存区域；我们说一个指针指向了某块内存区域，就相当于说该指针的值是这块内存区域的首地址。 
+　　指针所指向的内存区和指针所指向的类型是两个完全不同的概念。在例一中，指针所指向的类型已经有了，但由于指针还未初始化，所以它所指向的内存区是不存在的，或者说是无意义的。 
+　　以后，每遇到一个指针，都应该问问：这个指针的类型是什么？指针指的类型是什么？该指针指向了哪里？ 
+　　指针本身所占据的内存区 
+　　指针本身占了多大的内存？你只要用函数sizeof(指针的类型)测一下就知道了。在32位平台里，指针本身占据了4个字节的长度。 
+　　指针本身占据的内存这个概念在判断一个指针表达式是否是左值时很有用。 
+　　指针的算术运算 
+指针可以加上或减去一个整数。指针的这种运算的意义和通常的数值的加减运算的意义是不一样的。例如： 
+　　例二： 
+　　1、chara[20]; 
+　　2、int*ptr=a; 
+　　... 
+　... 
+　　3、ptr++; 
+　　在上例中，指针ptr的类型是int*,它指向的类型是int，它被初始化为指向整形变量a。接下来的第3句中，指针ptr被加了1，编译器是这样处理的：它把指针ptr的值加上了sizeof(int)，在32位程序中，是被加上了4。由于地址是用字节做单位的，故ptr所指向的地址由原来的变量a的地址向高地址方向增加了4个字节。 
+由于char类型的长度是一个字节，所以，原来ptr是指向数组a的第0号单元开始的四个字节，此时指向了数组a中从第4号单元开始的四个字节。 
+　　我们可以用一个指针和一个循环来遍历一个数组，看例子： 
+　　例三： 
+intarray[20]; 
+int*ptr=array; 
+... 
+//此处略去为整型数组赋值的代码。 
+... 
+for(i=0;i &lt;20;i++) 
+&#123; 
+　(*ptr)++; 
+　ptr++； 
+&#125; 
+　　这个例子将整型数组中各个单元的值加1。由于每次循环都将指针ptr加1，所以每次循环都能访问数组的下一个单元。 
+
+　　再看例子： 
+
+　　例四： 
+
+　　1、chara[20]; 
+　　2、int*ptr=a; 
+　　... 
+　　... 
+　　3、ptr+=5; 
+　　在这个例子中，ptr被加上了5，编译器是这样处理的：将指针ptr的值加上5乘sizeof(int)，在32位程序中就是加上了5乘4=20。由于地址的单位是字节，故现在的ptr所指向的地址比起加5后的ptr所指向的地址来说，向高地址方向移动了20个字节。在这个例子中，没加5前的ptr指向数组a的第0号单元开始的四个字节，加5后，ptr已经指向了数组a的合法范围之外了。虽然这种情况在应用上会出问题，但在语法上却是可以的。这也体现出了指针的灵活性。
+</code></pre>
+<p>参考：</p>
+<blockquote>
+<p><a href="http://tieba.baidu.com/p/1760590296">http://tieba.baidu.com/p/1760590296</a></p>
+</blockquote>
+]]></content>
+      <tags>
+        <tag>c</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>豹纹守宫饲养指南</title>
+    <url>/posts/3cf13399.html</url>
+    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><ol>
+<li> 要养好，每一句话都要好好看，要养不死，把注意事项背熟就行。</li>
+</ol>
+<h2 id="概念解释："><a href="#概念解释：" class="headerlink" title="概念解释："></a>概念解释：</h2><p>暖区冷区：饲养盒只加热一部分保持一部分高温一部分低温，可以让守宫自由选择舒适的温度</p>
+<p>加热垫：通电后会一直加热（本加热垫在室温15度以上环境不覆盖表面<br>表面温度能保持35度，极限工作温度在60度以下）</p>
+<p>温控：温控通过探头探测温度，可以设置在升温到指定温度后断电，温度低于指定温度后通电</p>
+<p>产房：守宫生产时会爬进去挖坑生产，生产完毕后会将坑埋上，用椰土作为垫材保持湿度</p>
+<p>孵化盒：守宫蛋从产房移动至孵化盒进行孵化，蛭石作为垫材保持湿度</p>
+<h2 id="注意事项（需要牢记）"><a href="#注意事项（需要牢记）" class="headerlink" title="注意事项（需要牢记）"></a>注意事项（需要牢记）</h2><ol>
+<li><p>温控探头要注意放在合适的地方固定，尽量保证温控探测温度和饲养盒暖区温度一致，否则一旦温控温度探测失效会导致加热垫一直加热<br> 有火灾和烧烤守宫的危险</p>
+</li>
+<li><p> 食盆和水盆在脏了后需要用滴露消毒液（1瓶盖（20ml）配一矿泉水瓶（500ml）水比例稀释）浸泡消毒半小时，消毒完毕用清水冲洗后才能使用</p>
+</li>
+<li><p> 守宫全身发白开始蜕皮后一天内未能将皮蜕光可视为蜕皮困难，需要人帮其撕掉，特别注意脚指头，尾巴尖，和头部的皮，这3处的皮发现残留后必须帮其撕掉，如果撕不掉可以将守宫泡水后撕，不撕会导致指头，尾部坏死和严重影响守宫情绪。对于经常性蜕皮困难的守宫可以加大维生素比例和在蜕皮时放水盆或者产房增加湿度，帮助其蜕皮</p>
+</li>
+<li><p> 2只公的绝对不能放在一起，碰到一起会战斗到死亡为止，小的时候混养的，长大性成熟后也会打架</p>
+</li>
+<li><p> 手拿过发情的公守宫后不建议摸第二只发情的公守宫，可能会被视为同类而发起攻击</p>
+</li>
+<li><p> 钙粉维生素需要放在阴凉避光密封处保存</p>
+</li>
+<li><p> 钙粉维生素不能沾水，发现受潮后需要换掉</p>
+</li>
+<li><p> 产房和孵化盒湿度保持在用手轻轻拽干即可，保持在不能太干燥也不能有水渗出的状态</p>
+</li>
+<li><p> 蛋不能沾水，沾水后需要用纸巾吸干，不能擦，蛋沾水死</p>
+</li>
+<li><p>蛋在产出后就不能翻转，需要用记号笔标记朝上的方位，蛋翻转死</p>
+</li>
+<li><p>交配时母守宫逃跑拒绝交配且反咬公的需要及时分开，换时间配（建议拿守宫交配时轻拉盒子，轻轻抓，轻轻放，不要让守宫感到害怕，交配时间最好选择在晚上交配）</p>
+</li>
+<li><p>产房内的椰土被守宫抛到盒子外面或者椰土被守宫推平，可视为可能已经产蛋，需要轻轻刨开椰土检查是否已经下蛋</p>
+</li>
+</ol>
+<h2 id="饲养环境"><a href="#饲养环境" class="headerlink" title="饲养环境"></a>饲养环境</h2><ol>
+<li><p> 温度保持在28-32度之间为宜</p>
+</li>
+<li><p> 湿度放水盆就行不需要特别关注</p>
+</li>
+<li><p> 钙粉，维生素，水可长期放置在盒子内 由守宫自取所需</p>
+</li>
+</ol>
+<h2 id="喂食"><a href="#喂食" class="headerlink" title="喂食"></a>喂食</h2><ol>
+<li><p> 可终生只喂食面包虫，置入食盆后守宫会自动取食，吃完了补上，死亡的面包虫建议夹走</p>
+</li>
+<li><p> 钙粉维生素置入玻璃盆后守宫会自动舔食</p>
+</li>
+<li><p> 水可1月给一次也可每天补满，守宫会通过食物满足部分所需水分</p>
+</li>
+<li><p> 繁殖期的母守宫水和钙粉维生素要供应充足</p>
+</li>
+</ol>
+<h2 id="繁殖"><a href="#繁殖" class="headerlink" title="繁殖"></a>繁殖</h2><ol>
+<li> 性别判断 公的会有2个蛋蛋，有鞭毛，母的没有这2个特征</li>
+</ol>
+<p><img src="%E8%B1%B9%E7%BA%B9%E5%AE%88%E5%AE%AB%E9%A5%B2%E5%85%BB%E6%8C%87%E5%8D%97/4e2083b8d63210b90660273fd37922fd.gif"></p>
+<ol start="2">
+<li><p>发情时间 豹纹守宫的繁殖季节很长,大约有七八个月之久,由秋季到春季都可以交配<br> 一般每年的惊蛰过后守宫开始发情，第一次发情后<br> 之后每年的发情时间会和第一次发情时间接近</p>
+</li>
+<li><p> 通常雌性每季会生产5到6次，每次2个蛋，一共能产下10-12枚蛋，交配成功后过一个月会下第一次蛋，之后2星期下一次</p>
+</li>
+<li><p> 如果没配上，卵黄会被母的吸收，可能会下未受精的蛋也可能不会下蛋，就和啥都没发生一样，所以需要多观察符合发情条件的母守宫肚子是否有红点，防止漏配</p>
+</li>
+<li><p> 繁殖至少需要守宫体重超过40克，年龄接近8个月。最优繁殖标准为母体重50克以上公45g以上，年龄超过8个月，低于40克的就不要配了</p>
+</li>
+<li><p> 母的发情后肚子上会出现红色的点，并且带有食欲减退拒食等情况，用手轻轻戳尾巴根部反应不激烈可以判断为发情中</p>
+</li>
+</ol>
+<p><img src="%E8%B1%B9%E7%BA%B9%E5%AE%88%E5%AE%AB%E9%A5%B2%E5%85%BB%E6%8C%87%E5%8D%97/bc25d99e09b1c94d3b8f62dad41aee16.jpg"></p>
+<ol start="7">
+<li><p> 公的发情后见到母的会振尾，正常情况下公的成年后（满8个月）全年发情</p>
+</li>
+<li><p> 将确认发情的母守宫放入公守宫的盒子后可观察如母守宫摇动尾巴和反咬公的即为拒绝交配，可视为交配失败须拿走过一段时间再试试，如母守宫尾巴抬高，原地不动表示顺从即为同意交配，等公守宫交配结束后将母守宫拿走即可</p>
+</li>
+<li><p>交配成功后，可隔天再配一次，一般连续配2次当年就不用再配了，也可生个3<br> 4胎后补配或者等生出水蛋后马上补配</p>
+</li>
+<li><p>产房准备<br>将椰土泡洗净后加入适当水分用微波炉烤10分钟消毒，椰土用手轻轻拽干至不会有水分流出，放入盒子内铺仅铺半边，3~4厘米厚度即可，盒子开一个容纳守宫轻松爬入爬出的口即可，开口不要有尖锐的刺容易扎到守宫，产房须保持湿润，一般一个产房对应一条母的专用，繁殖季结束后第二次使用产房椰土需要重新清洗消毒</p>
+</li>
+<li><p>孵化盒准备<br>将蛭石洗干净后加入适当水分用微波炉烤10分钟消毒，将水倒干，放入盒子铺平，厚度2~3厘米即可。孵化盒需要在孵化期间保持湿度，可仅开一个小口透气，孵化盒孵过守宫的位置就不再放入新的蛋，待所有位置使用过后重新清洗消毒后方可再次使用</p>
+</li>
+<li><p> 产蛋后需及时移入孵化盒，恒温孵化</p>
+</li>
+</ol>
+<h2 id="孵化"><a href="#孵化" class="headerlink" title="孵化"></a>孵化</h2><ol>
+<li><p>受精蛋中间会有一个红圈，受精蛋生出来很快就会变硬，蛋摸起来比较饱满，有些受精蛋刚生出来没红圈<br> 但是孵几天后就会出现红圈</p>
+</li>
+<li><p>未受精蛋无红圈，蛋摸起来很软很软，<br> 即便孵化一周还是和刚出生的时候一样软，也不会出现红圈</p>
+</li>
+</ol>
+<p><img src="%E8%B1%B9%E7%BA%B9%E5%AE%88%E5%AE%AB%E9%A5%B2%E5%85%BB%E6%8C%87%E5%8D%97/9fa30b026d8aadd75b6c1fcccceb43d6.jpg"></p>
+<blockquote>
+<p>  未受精蛋摸起来很软，放很久也不会变硬，中间也不会出现红圈</p>
+</blockquote>
+<p><img src="%E8%B1%B9%E7%BA%B9%E5%AE%88%E5%AE%AB%E9%A5%B2%E5%85%BB%E6%8C%87%E5%8D%97/5de7e467f6cb1f19199bcaca824f732a.jpg"></p>
+<blockquote>
+<p>  受精蛋中间会有一个红圈</p>
+</blockquote>
+<ol>
+<li> 孵化温度会影响孵化时间和性别，一般建议27~28度孵化，毕竟母的才是生产力，而且高温孵化的苗子容易因为发育过快导致体质不好也容易停止发育（可理解为早产儿）<br><img src="%E8%B1%B9%E7%BA%B9%E5%AE%88%E5%AE%AB%E9%A5%B2%E5%85%BB%E6%8C%87%E5%8D%97/8ce1f0361ce2c46b47d936b87ea5abf0.jpg"></li>
+<li> 蛋从产房取出放入孵化盒后就不用管了，湿度要高，但是要注意防止孵化盒水滴滴到蛋上，孵化盒需要保持温度不能有太大波动，发霉的蛋可以把毛擦了继续孵化</li>
+</ol>
+<h2 id="苗子管理"><a href="#苗子管理" class="headerlink" title="苗子管理"></a>苗子管理</h2><ol>
+<li><p> 刚孵化的守宫需要高湿度环境饲养，以帮助其褪去胎皮和适应环境，将纸巾彻底打湿后再将小壁虎放入，可放一个水盆保证长久湿润</p>
+</li>
+<li><p> 小壁虎刚出生的时候肚子里是有蛋黄的，不需要进食，它会在出生一周内排绿色的胎便，排胎便后方可喂食以及补充钙粉维生素</p>
+</li>
+</ol>
+<h2 id="疾病"><a href="#疾病" class="headerlink" title="疾病"></a>疾病</h2><ol>
+<li>肠胃炎 肠胃炎会传染，且会致死<br> 需要重视。守宫粪便黑色带一些白色的尿酸且成型为正常的大便，如粪便不成形拉稀且显绿色，而且拒绝进食可视为肠胃炎<br> 需要停食，升温，隔离，用具隔离使用防止交叉感染。请用药物治疗</li>
+</ol>
+<h2 id="判断情绪"><a href="#判断情绪" class="headerlink" title="判断情绪"></a>判断情绪</h2><ol>
+<li><p> 守宫在情绪激动的时候可能会攻击或者断尾所以简单的判断情绪还是需要的</p>
+</li>
+<li><p> 呼吸急促 表示情绪比较紧张 相对的 呼吸平缓表示情绪稳定</p>
+</li>
+<li><p>站立不动尾巴竖起缓慢地摇动<br> 这是进攻的标志，需要小心不要被咬，可以用夹子敲头吓住它</p>
+</li>
+<li><p> 发出吱吱吱的叫声拼命挣扎逃跑，赶紧撒手不然会断尾</p>
+</li>
+</ol>
+<h2 id="面包虫"><a href="#面包虫" class="headerlink" title="面包虫"></a>面包虫</h2><ol>
+<li><p> 可将购买来的面包虫进行升温喂食增加营养成分后放入低温透风处储藏（冰箱也行），面包虫耐干燥耐低温不耐高温不耐高湿度，低温状态下会减少进食，活动，蜕皮频率，过于潮湿会死亡</p>
+</li>
+<li><p> 给面包虫喂的东西都会进到守宫的肚子，给面包虫增养就是给守宫增养</p>
+</li>
+<li><p> 面包虫堆积厚度不宜超过2厘米</p>
+</li>
+<li><p> 面包虫适宜的饲养温度为20～30度，一般买来的成品面包虫需要尽量保持相对低温防止过快成为成虫，成虫是不能给守宫吃的</p>
+</li>
+<li><p> 面包虫饲养中产生的皮可以用吹风机吹走，粪便可用筛子筛掉</p>
+</li>
+<li><p> 面包虫可用狗粮，麦麸，肉类饲养，蔬菜也可饲养，但不建议连续使用蔬菜喂养，蔬菜也不能是冷冻过的和沾水的，湿度过大会导致面包虫死亡</p>
+</li>
+</ol>
+]]></content>
+      <tags>
+        <tag>豹纹守宫</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>hexo搭建笔记</title>
+    <url>/posts/aa6444c6.html</url>
+    <content><![CDATA[<p>请先参考官方网站指导</p>
+<blockquote>
+<p><a href="http://hexo.io/zh-cn/docs/index.html">http://hexo.io/zh-cn/docs/index.html</a><br>还有这篇博文<br><a href="http://www.songchubai.com/2015/08/12/github-gitcafe/">http://www.songchubai.com/2015/08/12/github-gitcafe/</a></p>
+</blockquote>
+<p>安装前需要先安装<strong>node.js</strong>以及<strong>git</strong><br>(记得将node的bin加入PATH /home/vagrant/.nvm/versions/node/v4.1.1/bin)<br>node.js安装成功后运行指令安装hexo</p>
+<pre><code>npm install -g hexo-cli
+</code></pre>
+<p>安装完成后建立目录运行命令</p>
+<pre><code>hexo init &lt;folder&gt;
+cd &lt;folder&gt;
+npm install
+</code></pre>
+<p>_config.yml配置</p>
+<pre><code>deploy:
+    type: git
+    repository: git@github.com:wdnb/blog.git
+    branch: gh-pages (主pages模式为master)
+</code></pre>
+<h2 id="同时部署到多个代码托管网站-需要使用同一个密钥"><a href="#同时部署到多个代码托管网站-需要使用同一个密钥" class="headerlink" title="同时部署到多个代码托管网站(需要使用同一个密钥)"></a>同时部署到多个代码托管网站(需要使用同一个密钥)</h2><pre><code>deploy:
+  type: git
+  message: &quot;&quot;
+  repo: 
+    gicafe: git@gitcafe.com:wdnb/wdnb.gitcafe.io.git,gitcafe-pages
+    github: git@github.com:wdnb/wdnb.github.io.git,master
+</code></pre>
+<p>在github上<br>1.创建项目<br>2.建立分支gh-pages</p>
+<p>指令<br>生成静态文件并推送到服务器</p>
+<pre><code>hexo d -g 
+</code></pre>
+<p>清除public目录下的文件</p>
+<pre><code>hexo -clean
+</code></pre>
+<p>有ERROR Deployer not found : github问题尝试执行</p>
+<pre><code>npm install hexo-deployer-git --save 
+</code></pre>
+<p>再运行</p>
+<p>在github上配置你的域名</p>
+<p>1：在hexo本地文件目录新建CNAME文件，内容为所用域名 如：blog.jbface.com<br>2：将域名解析到你的github主页网址 如:<br>主机记录blog,记录类型CNAME记录,记录值wdnb.github.io.</p>
+]]></content>
+      <tags>
+        <tag>hexo</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>hexo通过GitHub Pages建立站点</title>
+    <url>/posts/692644fd.html</url>
+    <content><![CDATA[<h2 id="两种pages模式"><a href="#两种pages模式" class="headerlink" title="两种pages模式"></a>两种pages模式</h2><ol>
+<li>User/Organization Pages 个人或公司站点</li>
+</ol>
+<ol>
+<li>使用自己的用户名，每个用户名下面只能建立一个；</li>
+<li>资源命名必须符合这样的规则username/username.github.com；</li>
+<li>主干上内容被用来构建和发布页面(master)</li>
+</ol>
+<h2 id="Project-Pages-项目站点"><a href="#Project-Pages-项目站点" class="headerlink" title="Project Pages 项目站点"></a>Project Pages 项目站点</h2><ol>
+<li><p>gh-pages分支用于构建和发布；</p>
+</li>
+<li><p>如果user/org pages使用了独立域名，那么托管在账户下的所有project pages将使用相同的域名进行重定向，除非project pages使用了自己的独立域名；</p>
+</li>
+<li><p>如果没有使用独立域名，project pages将通过子路径的形式提供服务username.github.com/projectname；</p>
+</li>
+<li><p>自定义404页面只能在独立域名下使用，否则会使用User Pages 404；</p>
+</li>
+<li><p>创建项目站点步骤：</p>
+<p> $ git clone <a href="https://github.com/USERNAME/PROJECT.git">https://github.com/USERNAME/PROJECT.git</a> PROJECT</p>
+<p> $ git checkout –orphan gh-pages</p>
+<p> $ git rm -rf .</p>
+<p> $ git add .</p>
+<p> $ git commit -a -m “First pages commit”</p>
+<p> $ git push origin gh-pages</p>
+</li>
+</ol>
+<h2 id="可以通过User-Organization-Pages建立主站，而通过Project-Pages挂载二级应用页面。"><a href="#可以通过User-Organization-Pages建立主站，而通过Project-Pages挂载二级应用页面。" class="headerlink" title="可以通过User/Organization Pages建立主站，而通过Project Pages挂载二级应用页面。"></a>可以通过User/Organization Pages建立主站，而通过Project Pages挂载二级应用页面。</h2>]]></content>
+      <tags>
+        <tag>hexo</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>CPU和内存的使用率算法</title>
+    <url>/posts/5b603ca3.html</url>
+    <content><![CDATA[<p><a href="http://www.blogjava.net/fjzag/articles/317773.html">Linux平台Cpu使用率的计算</a><br>##总的Cpu使用率计算</p>
+<p>计算方法：<br> cpu使用信息</p>
+<pre><code>cat /proc/stat
+</code></pre>
+<p>第一行的数值表示的是CPU总的使用情况，所以我们只要用第一行的数字计算就可以<br>1、  采样两个足够短的时间间隔的Cpu快照，分别记作t1,t2，其中t1、t2的结构均为：<br>(user、nice、system、idle、iowait、irq、softirq、stealstolen、guest)为CPU使用情况顺序排列的9元组 ;<br>2、  计算总的Cpu时间片totalCpuTime<br>a)         把第一次的所有cpu使用情况求和，得到s1;<br>b)         把第二次的所有cpu使用情况求和，得到s2;<br>c)         s2 - s1得到这个时间间隔内的所有时间片，即totalCpuTime = j2 - j1 ;<br>3、计算空闲时间idle<br>idle对应第四列的数据，用第二次的第四列 - 第一次的第四列即可<br>idle=第二次的第四列 - 第一次的第四列<br>6、计算cpu使用率<br>pcpu =100* (total-idle)/total</p>
+<p>##计算某个进程cpu和内存使用率</p>
+<p>###内存使用率计算：</p>
+<p>总内存量：totalmem = meminfo中获取内存的总量MemTotal对应的值</p>
+<p>进程实际占用内存大小：processmem = <pid>/status文件中获取VmRSS对应的值</p>
+<p>Ps: (实际也可以在<pid>/statm中获取，但里面是页数，要乘以每页的大小字节数，一般4k)</p>
+<p>内存使用率：pmem = processmem/totalmem * 100%;</p>
+<p>###cpu使用率计算：<br><a href="http://blog.jbface.com/post/linux/proc-pid-statwen-jian-jie-shi">proc/pid/stat文件解析</a><br>cpu总的使用时长: totalcpu1 = stat文件第一行数字总和，里面是各种时间，user + nice + system + idle + iowait + irq + softirq + stealstolen + guest</p>
+<p>进程使用cpu时长：processcpu1 = 读取<pid>/stat文件，按照空格区分，第14位到17位数字，分别表示为utime，stime，cutime，cstime，时长为utime+stime</p>
+<p>ps:(有些文章写需要四个时间加和，但我测试后结果和top,ps不一致，后看top源文件，发现并没有使用cutime，cstime，因此去掉)</p>
+<p>隔一段时间后，在同样方法取一次，标记为totalcpu2,processcpu2</p>
+<p>ps:(间隔时间不能过短，因为文件中记录的时间单位为1/100秒，即至少要大于10毫秒才有意义)</p>
+<p>cpu核数：cpunum = /proc/stat中，可以根据cpu[0-9]计算cpu核数</p>
+<p>cpu使用率：pcpu = (processcpu2-processcpu1)/(totalcpu2-totalcpu1)<em>cpunum</em>100%</p>
+]]></content>
+      <tags>
+        <tag>linux</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>centos iptables firewalld 开放端口</title>
+    <url>/posts/b6c1e5a0.html</url>
+    <content><![CDATA[<p>#centos6.X</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">iptables -I INPUT -p udp --dport 137 -j ACCEPT </span><br><span class="line">iptables -I INPUT -p udp --dport 138 -j ACCEPT </span><br><span class="line">iptables -I INPUT -p tcp --dport 139 -j ACCEPT    </span><br><span class="line">iptables -I INPUT -p tcp --dport 445 -j ACCEPT </span><br><span class="line">iptables-save</span><br><span class="line">service iptables save</span><br><span class="line">chkconfig iptables on </span><br></pre></td></tr></table></figure>
+<p>#centos7.x<br>centos7使用firewalld代替了原来的iptables<br>开启端口</p>
+<pre><code>firewall-cmd --zone=public --add-port=80/tcp --permanent
+</code></pre>
+<p>命令含义：<br> –zone #作用域<br>–add-port=80/tcp  #添加端口，格式为：端口/通讯协议<br> –permanent   #永久生效，没有此参数重启后失效<br>重启防火墙</p>
+<pre><code>firewall-cmd --reload
+</code></pre>
+]]></content>
+      <tags>
+        <tag>linux</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>etc passwd文件解释</title>
+    <url>/posts/2542581b.html</url>
+    <content><![CDATA[<p>cat /etc/passwd</p>
+<pre><code>    root:x:0:0:root:/root:/bin/bash 
+
+　　bin:x:1:1:bin:/bin:/sbin/nologin 
+
+　　daemon:x:2:2:daemon:/sbin:/sbin/nologin 
+
+　　desktop:x:80:80:desktop:/var/lib/menu/kde:/sbin/nologin 
+
+　　mengqc:x:500:500:mengqc:/home/mengqc:/bin/bash 
+</code></pre>
+<p>　　在该文件中，每一行用户记录的各个数据段用“：”分隔，分别定义了用户的各方面属性。各个字段的顺序和含义如下： </p>
+<p>　　注册名：口令：用户标识号：组标识号：用户名：用户主目录：命令解释程序 </p>
+<p>　　(1)注册名(login_name)：用于区分不同的用户。在同一系统中注册名是惟一的。在很多系统上，该字段被限制在8个字符(字母或数字)的长度之内；并且要注意，通常在Linux系统中对字母大小写是敏感的。这与MSDOS/Windows是不一样的。 </p>
+<p>　　(2)口令(passwd)：系统用口令来验证用户的合法性。超级用户root或某些高级用户可以使用系统命令passwd来更改系统中所有用户的口令，普通用户也可以在登录系统后使用passwd命令来更改自己的口令。 </p>
+<p>　　现在的Unix/Linux系统中，口令不再直接保存在passwd文件中，通常将passwd文件中的口令字段使用一个“x”来代替，将/etc /shadow作为真正的口令文件，用于保存包括个人口令在内的数据。当然shadow文件是不能被普通用户读取的，只有超级用户才有权读取。 </p>
+<p>　　此外，需要注意的是，如果passwd字段中的第一个字符是“*”的话，那么，就表示该账号被查封了，系统不允许持有该账号的用户登录。 </p>
+<p>　　(3)用户标识号(UID)：UID是一个数值，是Linux系统中惟一的用户标识，用于区别不同的用户。在系统内部管理进程和文件保护时使用 UID字段。在Linux系统中，注册名和UID都可以用于标识用户，只不过对于系统来说UID更为重要；而对于用户来说注册名使用起来更方便。在某些特 定目的下，系统中可以存在多个拥有不同注册名、但UID相同的用户，事实上，这些使用不同注册名的用户实际上是同一个用户。 </p>
+<p>　　(4)组标识号(GID)：这是当前用户的缺省工作组标识。具有相似属性的多个用户可以被分配到同一个组内，每个组都有自己的组名，且以自己的组标 识号相区分。像UID一样，用户的组标识号也存放在passwd文件中。在现代的Unix/Linux中，每个用户可以同时属于多个组。除了在 passwd文件中指定其归属的基本组之外，还在/etc/group文件中指明一个组所包含用户。 </p>
+<p>　　(5)用户名(user_name)：包含有关用户的一些信息，如用户的真实姓名、办公室地址、联系电话等。在Linux系统中，mail和finger等程序利用这些信息来标识系统的用户。 </p>
+<p>　　(6)用户主目录(home_directory)：该字段定义了个人用户的主目录，当用户登录后，他的Shell将把该目录作为用户的工作目录。 在Unix/Linux系统中，超级用户root的工作目录为/root；而其它个人用户在/home目录下均有自己独立的工作环境，系统在该目录下为每 个用户配置了自己的主目录。个人用户的文件都放置在各自的 </p>
+<p>　　主目录下。 </p>
+<p>　　(7)命令解释程序(Shell)：Shell是当用户登录系统时运行的程序名称，通常是一个Shell程序的全路径名， </p>
+<p>　　如/bin/bash。 </p>
+<p>　　需要注意的是，系统管理员通常没有必要直接修改passwd文件，Linux提供一些账号管理工具帮助系统管理员来创建和维护用户账号。 </p>
+<p>　　Linux口令管理之/etc/passwd文件 </p>
+<p>　　/etc/passwd文件是Linux/UNIX安全的关键文件之一.该文件用于用户登录时校验 用户的口令,当然应当仅对root可写.文件中每行的一般格式为: </p>
+<p>　　LOGNAME:PASSWORD:UID:GID:USERINFO:HOME:SHELL </p>
+<p>　　每行的头两项是登录名和加密后的口令,后面的两个数是UID和GID,接着的 一项是系统管理员想写入的有关该用户的任何信息,最后两项是两个路径名: 一个是分配给用户的HOME目录,第二个是用户登录后将执行的shell(若为空格则 缺省为/bin/sh). </p>
+<p>　　(1)口令时效 </p>
+<p>　　/etc/passwd文件的格式使系统管理员能要求用户定期地改变他们的口令. 在口令文件中可以看到,有些加密后的口令有逗号,逗号后有几个字符和一个 冒号.如: </p>
+<p>　　steve:xyDfccTrt180x,M.y8:0:0:admin:/:/bin/sh </p>
+<p>　　restrict:pomJk109Jky41,.1:0:0:admin:/:/bin/sh </p>
+<p>　　pat:xmotTVoyumjls:0:0:admin:/:/bin/sh </p>
+<p>　　可以看到,steve的口令逗号后有4个字符,restrict有2个,pat没有逗号. </p>
+<p>　　逗号后第一个字符是口令有效期的最大周数,第二个字符决定了用户再次 修改口信之前,原口令应使用的最小周数(这就防止了用户改了新口令后立刻 又改回成老口令).其余字符表明口令最新修改时间. </p>
+<p>　　要能读懂口令中逗号后的信息,必须首先知道如何用passwd_esc计数,计 数的方法是: </p>
+<p>　　.=0 /=1 0-9=2-11 A-Z=12-37 a-z=38-63 </p>
+<p>　　系统管理员必须将前两个字符放进/etc/passwd文件,以要求用户定期的 修改口令,另外两个字符当用户修改口令时,由passwd命令填入. </p>
+<p>　　注意:若想让用户修改口令,可在最后一次口令被修改时,放两个”.”,则下 一次用户登录时将被要求修改自己的口令. </p>
+<p>　　有两种特殊情况: </p>
+<p>　　. 最大周数(第一个字符)小于最小周数(第二个字符),则不允许用户修改 口令,仅超级用户可以修改用户的口令. </p>
+<p>　　. 第一个字符和第二个字符都是”.”,这时用户下次登录时被要求修改口 令,修改口令后,passwd命令将”.”删除,此后再不会要求用户修改口令. </p>
+<p>　　(2)UID和GID </p>
+<p>　　/etc/passwd中UID信息很重要,系统使用UID而不是登录名区别用户.一般 来说,用户的UID应当是独一无二的,其他用户不应当有相同的UID数值.根据惯 例,从0到99的UID保留用作系统用户的UID(root,bin,uucp等). </p>
+<p>　　如果在/etc/passwd文件中有两个不同的入口项有相同的UID,则这两个用 户对相互的文件具有相同的存取权限.</p>
+<p>　　/etc /group文件含有关于小组的信息,/etc/passwd中的每个GID在本文件中 应当有相应的入口项,入口项中列出了小组名和小组中的用户.这样可方便地了 解每个小组的用户,否则必须根据GID在/etc/passwd文件中从头至尾地寻找同组 用户. </p>
+<p>　　/etc/group文件对小组的许可权限的控制并不是必要的,因为系统用UID,GID (取自/etc/passwd)决定文件存取权限,即使/etc/group文件不存在于系统中,具 有相同的GID用户也可以小组的存取许可权限共享文件. </p>
+<p>　　小组就像登录用户一样可以有口令.如果/etc/group文件入口项的第二个域 为非空,则将被认为是加密口令,newgrp命令将要求用户给出口令,然后将口令加 密,再与该域的加密口令比较. </p>
+<p>　　给 小组建立口令一般不是个好作法.第一,如果小组内共享文件,若有某人猜 着小组口令,则该组的所有用户的文件就可能泄漏;其次,管理小组口令很费事, 因为对于小组没有类似的passwd命令.可用/usr/lib/makekey生成一个口令写入 /etc/group. </p>
+<p>　　以下情况必须建立新组: </p>
+<p>　　(1)可能要增加新用户,该用户不属于任何一个现有的小组. </p>
+<p>　　(2)有的用户可能时常需要独自为一个小组. </p>
+<p>　　(3)有的用户可能有一个SGID程序,需要独自为一个小组. </p>
+<p>　　(4)有时可能要安装运行SGID的软件系统,该软件系统需要建立一个新组. </p>
+<p>　　要 增加一个新组,必须编辑该文件,为新组加一个入口项. 由于用户登录时,系统从/etc/passwd文件中取GID,而不是从/etc/group中 取GID,所以group文件和口令文件应当具有一致性.对于一个用户的小组,UID和 GID应当是相同的.多用户小组的GID应当不同于任何用户的UID,一般为5位数,这 样在查看/etc/passwd文件时,就可根据5位数据的GID识别多用户小组,这将减少 增加新组,新用户时可能产生的混淆.</p>
+]]></content>
+      <tags>
+        <tag>linux</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>linux下sendmail邮件发送提示stat=Deferred</title>
+    <url>/posts/97b3cab1.html</url>
+    <content><![CDATA[<p>邮件发送日志所在位置:<code>/var/log/maillog</code>以及<code>/var/spool/mail/*</code><br>自建邮箱sendmail无法发送邮件,日志提示<br>stat=Deferred,<br>550 5.1.1 user unknown,<br>503 5.0.0 Need RCPT (recipient),<br>邮件被拒收,没有成功发送.<br>这里分析是由于SMTP协议设计上的缺陷,发邮件的时候随便填写一下别人的域名，就可以冒充别的网站来发送邮件了,自建邮箱没有配置SPF信息就被收件方服务提供商当作垃圾邮件直接拒收处理了.</p>
+<p>首先检查邮件服务是否启动,这里使用的是sendmail, <code>service sendmail start</code></p>
+<p>1:修改本地主机名 <code>hostname -v jbface.com</code><br>2:在域名控制处(上面的域名jbface.com)添加SPF记录 主机记录@,记录类型TXT,记录值 <code>v=spf1 ip4:1.1.1.1 ~all</code>,保存. 这里ip4后面的ip是你邮件发送服务器的固定ip</p>
+<p>等待域名解析生效.</p>
+]]></content>
+      <tags>
+        <tag>linux</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>linux小技巧</title>
+    <url>/posts/1779414e.html</url>
+    <content><![CDATA[<p>##ubuntu下unzip中文乱码<br>使用<code>unzip -O cp936</code>解压缩即可<br>##执行shell出现bad interpreter </p>
+<pre><code>:set ff
+</code></pre>
+<p>可以看到dos或unix的字样. 如果的确是dos格式的, 那么你可以用set ff=unix把它强制为unix格式的, 然后存盘退出. 再运行一遍看.</p>
+<h2 id="Linux修改字符集"><a href="#Linux修改字符集" class="headerlink" title="Linux修改字符集"></a>Linux修改字符集</h2><p>修改Linux服务器的配置文件：</p>
+<pre><code>vim /etc/sysconfig/i18n
+</code></pre>
+<p>如果安装系统的时候选择了中文系统，则把LANG字段改为：<br>LANG=”zh_CN.UTF-8”<br>如果安装系统的时候选择的英文系统，则把LANG字段改为：<br>LANG=”en_US.UTF-8”</p>
+<p>##centos6.5yum安装软件出现[Errno 256] No more mirrors to try</p>
+<pre><code>yum clean metadata
+yum clean all
+</code></pre>
+<h2 id="linux文件权限说明"><a href="#linux文件权限说明" class="headerlink" title="linux文件权限说明"></a>linux文件权限说明</h2><p>0 – no permission<br>1 – execute<br>2 – write<br>3 – write and execute<br>4 – read<br>5 – read and execute<br>6 – read and write<br>7 – read, write, and execute</p>
+<h2 id="linux系统时间修改"><a href="#linux系统时间修改" class="headerlink" title="linux系统时间修改"></a>linux系统时间修改</h2><p>1.调整年月日</p>
+<pre><code>date -s 05/10/2009 
+</code></pre>
+<p>2.调整时分秒</p>
+<pre><code>date -s 10:18:00
+</code></pre>
+]]></content>
+      <tags>
+        <tag>linux</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>linux常用指令</title>
+    <url>/posts/7f3cca4f.html</url>
+    <content><![CDATA[<h2 id="查看所有安装的软件包"><a href="#查看所有安装的软件包" class="headerlink" title="查看所有安装的软件包"></a>查看所有安装的软件包</h2><pre><code>rpm -qa  
+</code></pre>
+<h2 id="建立软链接"><a href="#建立软链接" class="headerlink" title="建立软链接"></a>建立软链接</h2><p><code>ln -s a b</code> 中的 a 就是源文件，b是链接文件名,其作用是当进入b目录，实际上是链接进入了a目录</p>
+<h2 id="安装本地rpm包"><a href="#安装本地rpm包" class="headerlink" title="安装本地rpm包"></a>安装本地rpm包</h2><pre><code>yum localinstall -y xxx.rpm
+</code></pre>
+<h2 id="关闭防火墙"><a href="#关闭防火墙" class="headerlink" title="关闭防火墙"></a>关闭防火墙</h2><pre><code>重启后生效 
+开启： chkconfig iptables on 
+关闭： chkconfig iptables off 
+
+即时生效，重启后失效 
+开启： service iptables start 
+关闭： service iptables stop 
+</code></pre>
+<h2 id="Linux关闭SELinux"><a href="#Linux关闭SELinux" class="headerlink" title="Linux关闭SELinux"></a>Linux关闭SELinux</h2><pre><code> 重启后永久性生效：
+修改/etc/selinux/config文件中设置SELINUX=disabled ，然后重启服务器。
+
+即时生效，重启后失效：
+使用命令`setenforce 0`
+</code></pre>
+<p>附：</p>
+<pre><code>setenforce 1 设置SELinux 成为enforcing模式
+
+setenforce 0 设置SELinux 成为permissive模式
+</code></pre>
+<h2 id="关闭蜂鸣声"><a href="#关闭蜂鸣声" class="headerlink" title="关闭蜂鸣声"></a>关闭蜂鸣声</h2><pre><code>rmmod pcspkr
+</code></pre>
+<h2 id="写入配置文件"><a href="#写入配置文件" class="headerlink" title="写入配置文件"></a>写入配置文件</h2><pre><code>echo &quot;alias pcspkr off&quot;&gt;&gt;/etc/modprobe.conf
+</code></pre>
+<h2 id="grep通过文件名查找文件所在位置"><a href="#grep通过文件名查找文件所在位置" class="headerlink" title="grep通过文件名查找文件所在位置"></a>grep通过文件名查找文件所在位置</h2><pre><code>    grep -rl &#39;filename&#39; ./
+</code></pre>
+<p>-r 选项表示递归(recursive)遍历所有子目录<br>-l 选项表示只列出文件名<br>./ 是目录名, 表示当前文件夹   </p>
+<p>##centos添加EPEL<br>    yum install epel-release</p>
+]]></content>
+      <tags>
+        <tag>linux</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>linux文件乱码_无效的编码</title>
+    <url>/posts/f7e8f3a9.html</url>
+    <content><![CDATA[<pre><code>yum install convmv
+</code></pre>
+<h2 id="convmv-使用方法："><a href="#convmv-使用方法：" class="headerlink" title="convmv 使用方法："></a>convmv 使用方法：</h2><pre><code>convmv -f 源编码 -t 新编码 [选项] 文件名
+</code></pre>
+<h2 id="常用参数："><a href="#常用参数：" class="headerlink" title="常用参数："></a>常用参数：</h2><pre><code>-r 递归处理子文件夹
+
+–notest 真正进行操作，默认情况下是不对文件进行真实操作
+
+–list 显示所有支持的编码
+
+–unescap 可以做一下转义，比如把%20变成空格
+</code></pre>
+<h2 id="应用举例："><a href="#应用举例：" class="headerlink" title="应用举例："></a>应用举例：</h2><pre><code>convmv -f GBK -t UTF-8 --notest  -r *
+</code></pre>
+<p>这句命令会对当前目录及子目录下所有的文件进行处理。</p>
+]]></content>
+      <tags>
+        <tag>linux</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>linux添加一个用户并且让用户获得root权限</title>
+    <url>/posts/fa8fca1a.html</url>
+    <content><![CDATA[<p>linux添加一个用户并且让用户获得root权限</p>
+<pre><code>#adduser vagrant  //添加一个名为vagrant的用户
+#passwd vagrant   //修改密码
+</code></pre>
+<p>修改 /etc/sudoers 文件，找到下面一行，在root下面添加一行，如下所示：</p>
+<pre><code>## Allow root to run any commands anywhere
+root    ALL=(ALL)     ALL
+vagrant   ALL=(ALL)     ALL
+</code></pre>
+<p>wq!强制保存并退出</p>
+]]></content>
+      <tags>
+        <tag>linux</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>linux编写开机启动脚本</title>
+    <url>/posts/a50b3d63.html</url>
+    <content><![CDATA[<p>编写shell脚本<br>前面3行必需</p>
+<pre><code>    #!/bin/bash
+    # chkconfig: 2345 20 80   [这个就是默认在2345运行级别是开启的，20为启动顺序，80为停止顺序]
+    # description: Saves and restores system entropy pool for \
+</code></pre>
+<p>chmod 755 wafinfo<br>放到目录/etc/profile.d/下<br>(chkconfig指令对应的服务要和文件名称完全对应)<br>注册服务</p>
+<pre><code>chkconfig --add wafinfo
+chkconfig --list wafinfo
+</code></pre>
+]]></content>
+      <tags>
+        <tag>linux</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>linux配置</title>
+    <url>/posts/28fb4256.html</url>
+    <content><![CDATA[<h2 id="linux检测远程端口是否打开"><a href="#linux检测远程端口是否打开" class="headerlink" title="linux检测远程端口是否打开"></a>linux检测远程端口是否打开</h2><p><code>nc -v ip port，如nc -v 172.17.193.18 5902</code><br>根据显示的Connected信息确定端口是否打开。</p>
+<p>若显示：Ncat:Connected to 172.17.193.18:5902.<br>则表示远程端口已打开。<br>若显示：Ncat:Connection refused.<br>则表示远程端口未打开。</p>
+<h2 id="查看io信息"><a href="#查看io信息" class="headerlink" title="查看io信息"></a>查看io信息</h2><p><code>iotop</code></p>
+<h2 id="查看网络流量"><a href="#查看网络流量" class="headerlink" title="查看网络流量"></a>查看网络流量</h2><p><code>iftop</code><br><code>iptraf-ng</code></p>
+]]></content>
+      <tags>
+        <tag>linux</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>linux配置ip及路由表</title>
+    <url>/posts/294322b5.html</url>
+    <content><![CDATA[<p>centos7配置ip：  </p>
+<pre><code>ip addr add 192.168.10.68/24  br + dev enp1s0
+ip ro add default via 192.168.10.1 dev enp1s0
+</code></pre>
+<p>配置静态ip</p>
+<pre><code>cd /etc/sysconfig/network-scripts
+</code></pre>
+<p>BOOTPROTO修改为static<br>ONBOOT=yes<br>IPADDR=192.168.10.99<br>GATEWAY=192.168.10.1<br>NETMASK=255.255.255.0</p>
+<pre><code>TYPE=Ethernet
+BOOTPROTO=static
+DEFROUTE=yes
+PEERDNS=yes
+PEERROUTES=yes
+IPV4_FAILURE_FATAL=no
+IPV6INIT=yes
+IPV6_AUTOCONF=yes
+IPV6_DEFROUTE=yes
+IPV6_PEERDNS=yes
+IPV6_PEERROUTES=yes
+IPV6_FAILURE_FATAL=no
+IPV6_ADDR_GEN_MODE=stable-privacy
+NAME=enp12s0
+UUID=bac373f2-baf4-4353-b3f5-646b0a4f0e6c
+DEVICE=enp12s0
+ONBOOT=yes
+IPADDR=192.168.10.99
+GATEWAY=192.168.10.1
+NETMASK=255.255.255.0
+</code></pre>
+<p>操作路由表</p>
+<pre><code>route
+route delete default
+ip route add default via 192.168.26.1
+</code></pre>
+]]></content>
+      <tags>
+        <tag>linux</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title> proc pid stat文件解释</title>
+    <url>/posts/bc870161.html</url>
+    <content><![CDATA[<p> /proc/pid/stat<br>包含了所有CPU活跃的信息，该文件中的所有值都是从系统启动开始累计到当前时刻。</p>
+<p>[root@localhost ~]# cat /proc/6873/stat<br>6873 (a.out) R 6723 6873 6723 34819 6873 8388608 77 0 0 0 41958 31 0 0 25 0 3 0 5882654 1409024 56 4294967295 134512640 134513720 3215579040 0 2097798 0 0 0 0 0 0 0 17 0 0 0 [root@localhost ~]#</p>
+<p>每个参数意思为：<br>参数 解释<br>pid=6873 进程(包括轻量级进程，即线程)号<br>comm=a.out 应用程序或命令的名字<br>task_state=R 任务的状态，R:runnign, S:sleeping (TASK_INTERRUPTIBLE), D:disk sleep (TASK_UNINTERRUPTIBLE), T: stopped, T:tracing stop,Z:zombie, X:dead<br>ppid=6723 父进程ID<br>pgid=6873 线程组号<br>sid=6723 c该任务所在的会话组ID<br>tty_nr=34819(pts/3) 该任务的tty终端的设备号，INT（34817/256）=主设备号，（34817-主设备号）=次设备号<br>tty_pgrp=6873 终端的进程组号，当前运行在该任务所在终端的前台任务(包括shell 应用程序)的PID。<br>task-&gt;flags=8388608 进程标志位，查看该任务的特性<br>min_flt=77 该任务不需要从硬盘拷数据而发生的缺页（次缺页）的次数<br>cmin_flt=0 累计的该任务的所有的waited-for进程曾经发生的次缺页的次数目<br>maj_flt=0 该任务需要从硬盘拷数据而发生的缺页（主缺页）的次数<br>cmaj_flt=0 累计的该任务的所有的waited-for进程曾经发生的主缺页的次数目<br>utime=1587 该任务在用户态运行的时间，单位为jiffies<br>stime=1 该任务在核心态运行的时间，单位为jiffies<br>cutime=0 累计的该任务的所有的waited-for进程曾经在用户态运行的时间，单位为jiffies<br>cstime=0 累计的该任务的所有的waited-for进程曾经在核心态运行的时间，单位为jiffies<br>priority=25 任务的动态优先级<br>nice=0 任务的静态优先级<br>num_threads=3 该任务所在的线程组里线程的个数<br>it_real_value=0 由于计时间隔导致的下一个 SIGALRM 发送进程的时延，以 jiffy 为单位.<br>start_time=5882654 该任务启动的时间，单位为jiffies<br>vsize=1409024（page） 该任务的虚拟地址空间大小<br>rss=56(page) 该任务当前驻留物理地址空间的大小<br>Number of pages the process has in real memory,minu 3 for administrative purpose.<br>这些页可能用于代码，数据和栈。<br>rlim=4294967295（bytes） 该任务能驻留物理地址空间的最大值<br>start_code=134512640 该任务在虚拟地址空间的代码段的起始地址<br>end_code=134513720 该任务在虚拟地址空间的代码段的结束地址<br>start_stack=3215579040 该任务在虚拟地址空间的栈的结束地址<br>kstkesp=0 esp(32 位堆栈指针) 的当前值, 与在进程的内核堆栈页得到的一致.<br>kstkeip=2097798 指向将要执行的指令的指针, EIP(32 位指令指针)的当前值.<br>pendingsig=0 待处理信号的位图，记录发送给进程的普通信号<br>block_sig=0 阻塞信号的位图<br>sigign=0 忽略的信号的位图<br>sigcatch=082985 被俘获的信号的位图<br>wchan=0 如果该进程是睡眠状态，该值给出调度的调用点<br>nswap 被swapped的页数，当前没用<br>cnswap 所有子进程被swapped的页数的和，当前没用<br>exit_signal=17 该进程结束时，向父进程所发送的信号<br>task_cpu(task)=0 运行在哪个CPU上<br>task_rt_priority=0 实时进程的相对优先级别<br>task_policy=0 进程的调度策略，0=非实时进程，1=FIFO实时进程；2=RR实时进程</p>
+]]></content>
+      <tags>
+        <tag>linux</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>su,su -,sudo的区别</title>
+    <url>/posts/bd1cb011.html</url>
+    <content><![CDATA[<p>解析su,su -,sudo的区别<br>作者：Warm Color<br>肯定有人不知道下面两个命令的区别,</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[warmcolor@PC ~]$ su</span><br><span class="line">[warmcolor@PC ~]$ su - ##(有个减号)</span><br></pre></td></tr></table></figure>
+
+<p>那下面两个命令的区别呢?</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[warmcolor@PC ~]$ su</span><br><span class="line">[warmcolor@PC ~]$ sudo su</span><br></pre></td></tr></table></figure>
+<p>首先,su,su -这两个命令都能获得root权限,<br>但root的密码是不能随便交给别人的,这时就需要sudo命令了,<br>使用用户自己的密码,临时赋予一般用户root权限,<br>sudo的运行过程是这样的:</p>
+<ol>
+<li>   检查用户是否在/etc/sudoers的列表中,</li>
+<li>   如果在,以root权限执行命令,</li>
+<li>   取消用户的root</li>
+</ol>
+<p>接着说说这三个命令的区别:<br>下面是su的过程:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">[warmcolor@PC ~]$ su</span><br><span class="line"> </span><br><span class="line">密码：</span><br><span class="line"> </span><br><span class="line">[root@PC warmcolor]# pwd</span><br><span class="line"> </span><br><span class="line">&#x2F;home&#x2F;warmcolor</span><br><span class="line"> </span><br><span class="line">[root@PC ~]# echo $PATH</span><br><span class="line"> </span><br><span class="line">&#x2F;usr&#x2F;lib&#x2F;qt-3.3&#x2F;bin:&#x2F;usr&#x2F;local&#x2F;bin:&#x2F;usr&#x2F;bin:&#x2F;bin:&#x2F;usr&#x2F;local&#x2F;sbin:&#x2F;usr&#x2F;sbin:&#x2F;sbin:&#x2F;home&#x2F;warmcolor&#x2F;bin</span><br></pre></td></tr></table></figure>
+<p>下面是su -的过程:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[warmcolor@PC ~]$ su -</span><br><span class="line">密码：</span><br><span class="line"> </span><br><span class="line">[root@PC ~]# pwd</span><br><span class="line"> </span><br><span class="line"> &#x2F;root</span><br><span class="line"> </span><br><span class="line">[root@PC ~]# echo $PATH</span><br><span class="line"> </span><br><span class="line">&#x2F;usr&#x2F;lib&#x2F;qt-3.3&#x2F;bin:&#x2F;usr&#x2F;local&#x2F;sbin:&#x2F;usr&#x2F;local&#x2F;bin:&#x2F;sbin:&#x2F;bin:&#x2F;usr&#x2F;sbin:&#x2F;usr&#x2F;bin:&#x2F;root&#x2F;bin</span><br></pre></td></tr></table></figure>
+<p>下面是sudo的过程:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[warmcolor@PC ~]$ sudo pwd</span><br><span class="line"> </span><br><span class="line">[sudo] password for warmcolor:</span><br><span class="line"> </span><br><span class="line">&#x2F;home&#x2F;warmcolor</span><br><span class="line"> </span><br><span class="line">[warmcolor@PC ~]$ sudo echo $PATH</span><br><span class="line"> </span><br><span class="line">&#x2F;usr&#x2F;lib&#x2F;qt-3.3&#x2F;bin:&#x2F;usr&#x2F;local&#x2F;bin:&#x2F;usr&#x2F;bin:&#x2F;bin:&#x2F;usr&#x2F;local&#x2F;sbin:&#x2F;usr&#x2F;sbin:&#x2F;sbin:&#x2F;home&#x2F;warmcolor&#x2F;bin</span><br></pre></td></tr></table></figure>
+<p>可以看出su和sudo没有切换工作目录和环境变量,只是赋予用户权限,<br>而su -是真正切换到root登录,工作目录切换到/root,环境变量也同时改变.<br>而网上还有一个说法,sudo 默认将原有的环境变量 reset,只保留一些对安全没有影响设定.</p>
+<p>至于上面第二个问题,答案其实很简单,<br>同样切换到root登录,<br>su使用root的密码,而sudo su使用用户密码.</p>
+<p>上述命令更为具体的描述请参见man手册.<br>  原文链接: </p>
+<blockquote>
+<p><a href="http://blog.warmcolor.net/?p=3542">http://blog.warmcolor.net/?p=3542</a></p>
+</blockquote>
+]]></content>
+      <tags>
+        <tag>linux</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>cas服务端配置</title>
+    <url>/posts/ee2d68bb.html</url>
+    <content><![CDATA[<p>用tomcat7配置ssl完成后提示”使用了不受支持的协议”无法访问,后更换tomcat6后解决<br>操作系统:<br>centos5.4<br>使用的软件版本<br>jdk:1.7.0_111<br>tomcat:apache-tomcat-6.0.45<br>cas client:php CAS-1.3.4<br>cas server:cas-server-4.0.0-release<br>一:配置初始环境<br>1:安装openjdk<br>yum install java-1.7.0-openjdk-devel.x86_64<br>2:默认目录在/usr/lib/jvm/java(这是一个软链接)<br>3:配置环境变量</p>
+<pre><code>vim /etc/profile
+</code></pre>
+<p>最末尾添加以下内容<br>JAVA_HOME=/usr/lib/jvm/java<br>PATH=$JAVA_HOME/bin:$PATH<br>CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar<br>export JAVA_HOME<br>export PATH<br>export CLASSPATH</p>
+<pre><code>source /etc/profile
+</code></pre>
+<p>二:配置tomcat ssl<br>1:生成证书</p>
+<pre><code>keytool -genkey -alias tomcat -keyalg RSA -keystore /root/keystore.jks
+</code></pre>
+<p>填入的内容随意,最后输入yes回车,最后提示Enter key password for <tomcat>回车即可</p>
+<p>2:修改%TOMCAT_HOME%/conf/server.xml文件，添加以下内容：<br>keystoreFile和keystorePass为证书存放路径和密码</p>
+<pre><code>&lt;Connector port=&quot;8443&quot; protocol=&quot;HTTP/1.1&quot; SSLEnabled=&quot;true&quot;
+maxThreads=&quot;150&quot; scheme=&quot;https&quot; secure=&quot;true&quot;
+clientAuth=&quot;false&quot; sslProtocol=&quot;TLS&quot;
+keystoreFile=&quot;/root/keystore.jks&quot;
+keystorePass=&quot;system&quot; /&gt;
+</code></pre>
+<p>3:<br>使用%TOMCAT_HOME%/bin/startup.sh启动tomcat<br>访问<a href="https://192.168.25.163:8443/">https://192.168.25.163:8443/</a><br>如不能访问请访问8080端口查看tomcat服务是否正常</p>
+<p>三:cas服务端安装<br>拷贝cas-server-4.0.0/modules/cas-server-webapp-4.0.0.war<br>到%TOMCAT_HOME%/webapps/目录下<br>重命名为cas.war<br>启动tomcat服务<br>访问<a href="https://192.168.25.163:8443/cas">https://192.168.25.163:8443/cas</a><br>默认用户名和密码为 casuser:Mellon</p>
+]]></content>
+      <tags>
+        <tag>cas</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>nfs环境搭建</title>
+    <url>/posts/46f7dac1.html</url>
+    <content><![CDATA[<h2 id="方式一："><a href="#方式一：" class="headerlink" title="方式一："></a>方式一：</h2><pre><code>sudo ifconfig eth2 192.168.7.54 netmask 255.255.255.0 
+</code></pre>
+<p>说明：该种方式可以使改变即时生效，重启后会恢复为原来的IP </p>
+<h2 id="方式二："><a href="#方式二：" class="headerlink" title="方式二："></a>方式二：</h2><p>说明：该方式要重启后生效，且是永久的 </p>
+<p>UBUNTU</p>
+<pre><code>sudo vim /etc/network/interfaces
+</code></pre>
+<p>CENTOS</p>
+<pre><code>vim /etc/sysconfig/network-scripts/ifcfg-eth0
+
+ 1 # Advanced Micro Devices [AMD] 79c970 [PCnet32 LANCE]
+  2 DEVICE=eth0
+  3 BOOTPROTO=none
+  4 HWADDR=00:0c:29:7e:b0:34
+  5 ONBOOT=yes
+  6 TYPE=Ethernet
+  7 USERCTL=no
+  8 IPV6INIT=no
+  9 PEERDNS=yes
+ 10 NETMASK=255.255.255.0
+ 11 IPADDR=192.168.7.51
+ 12 GATEWAY=192.168.7.1
+</code></pre>
+<hr>
+<pre><code>mount -t nfs -o nolock 192.168.7.54:/home/lierda/env/nfs /mnt
+</code></pre>
+<p>在用户目录下新建ENV文件夹，在ENV里新建用于放网络<br>文件系统的文件夹huzl_nfs</p>
+<p>在终端里执行<code>sudo apt-get install portmap nfs-kernel-server</code></p>
+<p>安装好后再安装<code>sudo apt-get install portmap nfs-common</code></p>
+<p>然后<code>sudo gedit /etc/exports</code></p>
+<p>在文件的最后加上<code>/home/huzl/env/huzl_nfs/my_wlw_fs</code></p>
+<pre><code>*(rw,sync,no_root_squash)
+</code></pre>
+<p>保存退出。</p>
+<p>重启nfs服务器</p>
+<pre><code>sudo /etc/init.d/portmap restart
+sudo /etc/init.d/nfs-kernel-server restart
+</code></pre>
+<p>测试nfs服务器</p>
+<pre><code>showmount –e
+</code></pre>
+]]></content>
+      <tags>
+        <tag>nfs</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>rsync配置</title>
+    <url>/posts/685e764b.html</url>
+    <content><![CDATA[<h2 id="rsyncd-conf"><a href="#rsyncd-conf" class="headerlink" title="rsyncd.conf"></a>rsyncd.conf</h2><pre><code># Minimal configuration file for rsync daemon
+# See rsync(1) and rsyncd.conf(5) man pages for help
+ 
+# This line is required by the /etc/init.d/rsyncd script
+pid file = /var/run/rsyncd.pid   
+port = 873 
+address = 209.141.51.244
+#uid = nobody
+#gid = nobody   
+uid = root   
+gid = root   
+ 
+use chroot = yes 
+read only = yes 
+ 
+ 
+#limit access to private LANs
+#hosts allow=192.168.1.0/255.255.255.0 10.0.1.0/255.255.255.0 
+#hosts deny=*
+hosts allow=23.244.180.54
+max connections = 3
+motd file = /etc/rsyncd/rsyncd.motd
+ 
+#This will give you a separate log file
+log file = /home/wwwlogs/rsync.log
+ 
+#This will log every file transferred - up to 85,000+ per user, per sync
+#transfer logging = yes
+ 
+log format = %t %a %m %f %b
+syslog facility = local3
+timeout = 300
+ 
+[backup]   
+path = /root
+list=yes
+ignore errors
+auth users = rsync
+secrets file = /etc/rsyncd/rsyncd.secrets
+</code></pre>
+<h2 id="rs-sh"><a href="#rs-sh" class="headerlink" title="rs.sh"></a>rs.sh</h2><pre><code>rsync -avzP --delete  --password-file=./pass rsync@209.141.51.244::backup /backup
+</code></pre>
+<h2 id="rsyncd-secrets"><a href="#rsyncd-secrets" class="headerlink" title="rsyncd.secrets"></a>rsyncd.secrets</h2><pre><code>rsync:system
+</code></pre>
+<h2 id="pass"><a href="#pass" class="headerlink" title="pass"></a>pass</h2><pre><code>system
+</code></pre>
+<h2 id="rsync服务重启"><a href="#rsync服务重启" class="headerlink" title="rsync服务重启"></a>rsync服务重启</h2><pre><code>209.141.51.244
+
+/usr/bin/rsync -vzrtopg --delete  --progress root@209.141.51.244::backup 
+./backup
+
+//开机启动  把下面的代码放到/etc/rc.local
+rsync --daemon --config=/etc/rsyncd/rsyncd.conf 
+ps -ef |grep rsync
+kill -9 0000
+</code></pre>
+<p>在前面”一句话SSH命令利用rsync同步备份VPS网站目录文件”文章中仅仅是简单RSYNC功能应用，强大的RSYNC不仅仅这么简单的功能。鉴于老左的能力和技术有限，搜寻强大的网络资源库看看有没有对RSYNC升级的应用功能加以学习应用。看到小夜的关于RSYNC增量备份的文章，于是老左这边也一起学习和整理看看是否完整能够实现定时同步增量备份。<br>第一、RSYNC同步备份准备工作<br>我们需要先下载2个文件包：RSYNC服务器端配置文件（VPS数据部分） /RSYNC客户端配置文件（VPS备份主机）<br>客户端：<a href="http://soft.laozuo.org/backup/rsync-root.zip">http://soft.laozuo.org/backup/rsync-root.zip</a><br>服务器端：<a href="http://soft.laozuo.org/backup/rsync-server.zip">http://soft.laozuo.org/backup/rsync-server.zip</a><br>第二、配置服务器端VPS<br>我们把rsync-server.zip下载的服务器端RSYNC配置文件上传至/etc目录，在上传之前，需要修改几个位置：<br>A - rsyncd.conf第7行的address = 11.11.11.11把IP地址修改成我们的服务器端IP地址<br>B -rsyncd.conf 第20行修改hosts allow=22.22.22.22修改成我们客户端的IP地址<br>C -rsyncd.conf第35行修改path = /home/wwwroot/ 修改成我们需要同步的目录<br>D - 修改rsyncd.secrets文件中的用户名和密码（用户名需要与下面的E一致，密码随意），然后在SSH中授予600权限<br>chmod 600 /etc/rsyncd/rsyncd.secrets<br>E -rsyncd.conf第38行，auth users = loong ，后面的loong用户名需要与上面D中设置的用户名一致<br>第三、设置服务器端运行rsync<br>/usr/bin/rsync –daemon –config=/etc/rsyncd/rsyncd.conf<br>第四、设置客户端配置文件<br>下载rsync-root.zip文件，修改文件后上传至ROOT目录中<br>A - 设置/root/pass文件中的密码为客户端ROOT密码，并且也需要授权600权限<br>chmod 600 /root/root/pass<br>B - 设置/root/rs.sh中的脚本路径，需要保持与服务器端一致<br>rsync -avzP –delete –password-file=/root/pass <a href="mailto:&#x6c;&#x61;&#x6f;&#x7a;&#x75;&#111;&#115;&#101;&#x72;&#x76;&#101;&#114;&#64;&#49;&#x31;&#49;&#x2e;&#49;&#x31;&#49;&#46;&#49;&#x31;&#x31;&#46;&#49;&#x31;&#49;">&#x6c;&#x61;&#x6f;&#x7a;&#x75;&#111;&#115;&#101;&#x72;&#x76;&#101;&#114;&#64;&#49;&#x31;&#49;&#x2e;&#49;&#x31;&#49;&#46;&#49;&#x31;&#x31;&#46;&#49;&#x31;&#49;</a>::vpsmmhome /home/wwwroot/laozuo.org/<br>#laozuoserver为服务器端/etc/rsyncd/rsyncd.secrets的用户名一致<br>#111.111.111.111代表服务器端的IP地址<br>#vpsmmhome为/etc/rsyncd/rsyncd.conf中自定义用户名<br>#/home/wwwroot/laozuo.org/为需要同步备份的网站目录<br>C - 设置rs.sh权限<br>chmod +x /root/rs.sh<br>第五、测试备份以及定时备份<br>执行sh rs.sh可以实现测试现在就手工备份，执行的时候需要我们输入/root/pass的密码，然后才可以执行</p>
+<p>我们肯定不是需要手工备份，我们需要定时执行备份脚本（输入 crontab -e 然后添加下面一行）。<br>30 */1 * * * /root/rs.sh<br>备注：每小时的30分钟自动同步一次，这个时间我们可以自己设置，你也可以设置一天备份一次。<br>老左在写教程的时候已经测试成功一次，且定时设置，可以确保这篇文章是完整的。RSYNC这篇的备份是定时增备份，如果文件没有变化是不会变动，会变动有变动的文件，保持与客户端一致，同样的我们也可以设置数据库的备份，这样保证文件的同步，一旦客户端VPS出现问题，我们只要切换解析就可以保证网站可以不受影响。</p>
+<blockquote>
+<p><a href="http://www.laozuo.org/4480.html">http://www.laozuo.org/4480.html</a> | 老左博客</p>
+</blockquote>
+]]></content>
+      <tags>
+        <tag>rsync</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>samba服务配置</title>
+    <url>/posts/c60046db.html</url>
+    <content><![CDATA[<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><pre><code>yum install samba
+</code></pre>
+<h2 id="将root用户添加到samba用户当中"><a href="#将root用户添加到samba用户当中" class="headerlink" title="将root用户添加到samba用户当中"></a>将root用户添加到samba用户当中</h2><pre><code>smbpasswd -a root    
+</code></pre>
+<h2 id="开机启动"><a href="#开机启动" class="headerlink" title="开机启动"></a>开机启动</h2><pre><code>chkconfig smb on
+</code></pre>
+<h2 id="防火墙开放端口（或者是直接关闭-etc-init-d-iptables-stop）"><a href="#防火墙开放端口（或者是直接关闭-etc-init-d-iptables-stop）" class="headerlink" title="防火墙开放端口（或者是直接关闭 /etc/init.d/iptables stop）"></a>防火墙开放端口（或者是直接关闭 /etc/init.d/iptables stop）</h2><p>开放端口 </p>
+<pre><code>iptables -I INPUT -p udp --dport 137 -j ACCEPT 
+iptables -I INPUT -p udp --dport 138 -j ACCEPT 
+iptables -I INPUT -p tcp --dport 139 -j ACCEPT    
+iptables -I INPUT -p tcp --dport 445 -j ACCEPT 
+iptables-save
+service iptables save
+chkconfig iptables on 
+</code></pre>
+<h2 id="配置sabam服务访问软链接权限"><a href="#配置sabam服务访问软链接权限" class="headerlink" title="配置sabam服务访问软链接权限"></a>配置sabam服务访问软链接权限</h2><pre><code>[global] 
+unix extensions  = No
+</code></pre>
+<h2 id="共享目录"><a href="#共享目录" class="headerlink" title="共享目录"></a>共享目录</h2><pre><code>vim /etc/samba/smb.conf
+  
+[coding]
+path = /html
+public = yes
+writable = yes
+printable = no
+</code></pre>
+<p>##重启启服务</p>
+<pre><code>service smb restart
+</code></pre>
+<p>##在windows下连接samba服务器<br>映射网络驱动器<br>地址类似</p>
+<pre><code>\\192.168.25.168\H3C
+</code></pre>
+<p>前半段为IP,后半段为smb.conf里所配置的目录名称</p>
+<h2 id="Linux下连接指令"><a href="#Linux下连接指令" class="headerlink" title="Linux下连接指令"></a>Linux下连接指令</h2><p>smbclient  <code>//209.141.51.244/root -U root</code></p>
+<h2 id="win下清除网络认证"><a href="#win下清除网络认证" class="headerlink" title="win下清除网络认证"></a>win下清除网络认证</h2><p> 首先通过开始—运行—cmd输入：“net use”命令查看现有的连接，然后执行“net use \Samba服务器IP地址或者netbios名称\ipc$  /del”，删除Samba服务器已经建立的连接。或者执行“net use * /del”将现在所有的连接全部删除。最后，再次执行“\ip地址”时，就可以切换用户了。</p>
+<h2 id="win10无法映射网络驱动器解决办法"><a href="#win10无法映射网络驱动器解决办法" class="headerlink" title="win10无法映射网络驱动器解决办法"></a>win10无法映射网络驱动器解决办法</h2><p>将计算机账户设置为本地账户，如使用微软账户则无法登陆<br>打开注册表 Win+R输入regedit,定位到如下位置 HKLM\SYSTEM\CurrentControlSet\Services\LanmanWorkstation\Parameters 创建一个 DWORD 项，命名为 ‘AllowInsecureGuestAuth’ ，值设置为“1”.</p>
+<p> 最后重启计算机再次访问查看结果。</p>
+<p>参考地址</p>
+<blockquote>
+<p><a href="http://einverne.github.io/2015/07/12/windows-10-cannot-connect-openwrt-samba.html">http://einverne.github.io/2015/07/12/windows-10-cannot-connect-openwrt-samba.html</a></p>
+</blockquote>
+]]></content>
+      <tags>
+        <tag>sabma</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>sftp服务器配置</title>
+    <url>/posts/8ad2abea.html</url>
+    <content><![CDATA[<h2 id="安装vsftpd"><a href="#安装vsftpd" class="headerlink" title="安装vsftpd"></a>安装vsftpd</h2><pre><code>yum install vsftpd
+</code></pre>
+<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><pre><code> vi /etc/vsftpd.conf
+</code></pre>
+<h2 id="注销掉，关闭匿名访问"><a href="#注销掉，关闭匿名访问" class="headerlink" title="注销掉，关闭匿名访问"></a>注销掉，关闭匿名访问</h2><pre><code>#anonymous_enable=YES
+</code></pre>
+<h2 id="去掉-让本地账号可以访问，比如root，等系统登录账号"><a href="#去掉-让本地账号可以访问，比如root，等系统登录账号" class="headerlink" title="去掉#让本地账号可以访问，比如root，等系统登录账号"></a>去掉#让本地账号可以访问，比如root，等系统登录账号</h2><pre><code>local_enable=YES 
+write_enable=YES
+
+你需要在`/etc/vsftpd/user_list`文件中把root那一行删除或者注释掉
+同理，`/etc/vsftpd/ftpusers`文件中的root也注释掉
+</code></pre>
+<h2 id="设置开机启动"><a href="#设置开机启动" class="headerlink" title="设置开机启动"></a>设置开机启动</h2><pre><code>chkconfig vsftpd on
+</code></pre>
+]]></content>
+      <tags>
+        <tag>ftp</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>自行编译GCC</title>
+    <url>/posts/469b22c3.html</url>
+    <content><![CDATA[<p>载并解压GCC源码后执行：</p>
+<blockquote>
+<p><a href="https://ftp.gnu.org/gnu/gcc/">https://ftp.gnu.org/gnu/gcc/</a></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ cd GCC_SOURCE # GCC_SOURCE代表你解压源代码的目录</span><br><span class="line">$ .&#x2F;contrib&#x2F;download_prerequisites # 由脚本下载并解压必备库</span><br><span class="line">$ cd #回到家目录</span><br><span class="line">$ mkdir gcc-build</span><br><span class="line">$ cd gcc-build</span><br><span class="line">$ ..&#x2F;GCC_SOURCE&#x2F;configure --prefix&#x3D;$HOME --enable-languages&#x3D;c,c++ --disable-multilib </span><br><span class="line">$ make -j4</span><br><span class="line">$ make install</span><br></pre></td></tr></table></figure>
+<p>检验结果<br>由于我们指定了–prefix=$HOME，所以GCC的可执行文件将被安装到$HOME/bin，请确保该目录位于$PATH中，然后执行$ gcc –version确认GCC版本。<br>引用地址</p>
+<blockquote>
+<p><a href="https://segmentfault.com/a/1190000002982589">https://segmentfault.com/a/1190000002982589</a></p>
+</blockquote>
+<p>##切换gcc版本</p>
+<p>execute in terminal :</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">gcc -v</span><br><span class="line">g++ -v</span><br></pre></td></tr></table></figure>
+<p>Okay, so that part is fairly simple. The tricky part is that when you issue the command GCC it is actually a sybolic link to which ever version of GCC you are using. What this means is we can create a symbolic link from GCC to whichever version of GCC we want.<br>•    You can see the symbolic link :</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ls -la &#x2F;usr&#x2F;bin | grep gcc-4.4</span><br><span class="line">ls -la &#x2F;usr&#x2F;bin | grep g++-4.4</span><br></pre></td></tr></table></figure>
+<p>•    So what we need to do is remove the GCC symlink and the G++ symlink and then recreate them linked to GCC 4.3 and G++ 4.3:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">rm &#x2F;usr&#x2F;bin&#x2F;gcc</span><br><span class="line">rm &#x2F;usr&#x2F;bin&#x2F;g++</span><br><span class="line"></span><br><span class="line">ln -s &#x2F;usr&#x2F;bin&#x2F;gcc-4.3 &#x2F;usr&#x2F;bin&#x2F;gcc</span><br><span class="line">ln -s &#x2F;usr&#x2F;bin&#x2F;g++-4.3 &#x2F;usr&#x2F;bin&#x2F;g++</span><br></pre></td></tr></table></figure>
+<p>•    Now if we check the symbolic links again we will see GCC &amp; G++ are now linked to GCC 4.3 and G++ 4.3:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ls -la &#x2F;usr&#x2F;bin&#x2F; | grep gcc</span><br><span class="line">ls -la &#x2F;usr&#x2F;bin&#x2F; | grep g++</span><br></pre></td></tr></table></figure>
+<p>•    Finally we can check our GCC -v again and make sure we are using the correct version:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">gcc -v</span><br><span class="line">g++ -v</span><br></pre></td></tr></table></figure>]]></content>
+      <tags>
+        <tag>gcc</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>mariadb安装</title>
+    <url>/posts/dbb635cd.html</url>
+    <content><![CDATA[<h2 id="安装MySQL"><a href="#安装MySQL" class="headerlink" title="安装MySQL"></a>安装MySQL</h2><p><code>sudo apt install mariadb-server</code></p>
+<h2 id="设置数据库"><a href="#设置数据库" class="headerlink" title="设置数据库"></a>设置数据库</h2><p><code>sudo mysql_secure_installation</code></p>
+<p>此时系统会询问你：Enter current password for root (enter for none): ,按回车（enter）键，因为第一次登陆是没有密码的。</p>
+<p>然后会询问你： Set root password? —— 按 y ，进行root帐号的密码设置</p>
+<p>此时，会提示 New password ,在此输入你的MySQL密码，请牢记这个密码，输入完成按回车，会提示re-enter new password此时再重复输入密码，回车即可。</p>
+<p>然后，询问你 Remove anonymous users ，按 y 。</p>
+<p>然后，询问你 Disallow root login remotely ，按 y 。</p>
+<p>然后，询问你 Remove test database and access to it ，按 y 。</p>
+<p>然后，询问你 Reload privilege tables now ，按 y 。</p>
+<p>最后，您将看到消息 All done! 和 Thanks for using MariaDB! 。表示已经设置完成了。</p>
+]]></content>
+      <tags>
+        <tag>mariadb</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>mariadb配置</title>
+    <url>/posts/e6a6fd56.html</url>
+    <content><![CDATA[<h2 id="mariadb远程访问"><a href="#mariadb远程访问" class="headerlink" title="mariadb远程访问"></a>mariadb远程访问</h2><h3 id="增加远程访问账户"><a href="#增加远程访问账户" class="headerlink" title="增加远程访问账户"></a>增加远程访问账户</h3><p>添加远程访问账户</p>
+<p><code>mysql&gt;GRANT ALL PRIVILEGES ON *.* TO &#39;root&#39;@&#39;%&#39; IDENTIFIED BY &#39;123456&#39; WITH GRANT OPTION;</code></p>
+<p>将当前user和privilige表中的用户信息/权限设置从mysql库(MySQL数据库的内置库)中提取到内存里</p>
+<p><code>mysql&gt;FLUSH PRIVILEGES</code></p>
+<p>看是否多了个%的账号<br><code>mysql&gt;select user,host,password from mysql.user</code></p>
+<h3 id="mariadb设置远程访问"><a href="#mariadb设置远程访问" class="headerlink" title="mariadb设置远程访问"></a>mariadb设置远程访问</h3><p>MariaDB为了提高安全性，默认只监听127.0.0.1中的3306端口并且禁止了远程的TCP链接</p>
+<p>注释bind-address项以使得所有ip能够访问mariadb</p>
+<p>查找<br><code>cd /etc/mysql/</code><br><code>grep -rn &quot;skip-networking&quot; *</code><br>这里能看到skip-networking这个选项所在配置文件名字是50-server.cnf<br>编辑文件注释掉bind-address<br><code>vim /etc/mysql/mariadb.conf.d/50-server.cnf</code><br>重启mariadb<br>systemctl restart mysql</p>
+]]></content>
+      <tags>
+        <tag>mariadb</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>mysql允许null与default值</title>
+    <url>/posts/f1a1a78f.html</url>
+    <content><![CDATA[<h2 id="Mysql-允许null-与-default值"><a href="#Mysql-允许null-与-default值" class="headerlink" title="Mysql 允许null 与 default值"></a>Mysql 允许null 与 default值</h2><p>分为下面4种情况：<br>1、允许null， 指定default值。<br>2、允许null， 不指定default，这个时候可认为default值就是null<br>3、不允许null，指定default值，不能指定default值为null，否者报错 Invalid default value for xxx<br>4、不允许null，不指定default值。这种情况，Insert的时候，必须指定值。否者报错 Field xxx doesn’t have a default value</p>
+]]></content>
+      <tags>
+        <tag>mysql</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>mysql基本操作</title>
+    <url>/posts/a3150f25.html</url>
+    <content><![CDATA[<p>当向表中插入字符串值（以及一些数据值时）。必须使用引号，否则MySQL认为它们是字段名：<br>自增主键的值设为NULL或者‘’；<br>包含引用标志的值需要在前面加上反斜线（转义符），不过数值不需要加引号：</p>
+<h2 id="显示命令"><a href="#显示命令" class="headerlink" title="显示命令"></a>显示命令</h2><p>1、显示数据库列表。 </p>
+<pre><code>show databases; 
+</code></pre>
+<p>2、显示库中的数据表：<br>选择数据库</p>
+<pre><code>use mysql;
+show tables; 
+</code></pre>
+<p>3、显示数据表的结构： </p>
+<pre><code>describe 表名; 
+</code></pre>
+<p>4:查询表中的记录： </p>
+<pre><code>select * from 表名
+</code></pre>
+<p>##修改操作<br>1:修改表字段名称</p>
+<pre><code>alter table T_VMD_VERSION change logid log_id int UNSIGNED NOT NULL
+</code></pre>
+<p>2:修改表字段的数据类型</p>
+<pre><code>alter table T_USER_MESSAGE modify addtime INT;
+ALTER TABLE T_USER_MESSAGE  modify content longtext binary;
+</code></pre>
+<p>3:修改字段默认值</p>
+<pre><code>alter table表名alter column字段名drop default; (若本身存在默认值，则先删除)
+alter table 表名 alter column 字段名 set default 默认值;(若本身不存在则可以直接设定)
+</code></pre>
+<p>4:修改表名字</p>
+<pre><code>ALTER  TABLE table_name RENAME TO new_table_name； 
+</code></pre>
+<p>5:添加表字段</p>
+<pre><code>ALTER TABLE TABLE_NAME ADD FIELDNAME TINYINT(1) UNSIGNED NOT NULL;
+// ALTER TABLE T_USER_MESSAGE ADD message_id int UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY;
+</code></pre>
+<p>##新建操作<br>1:建库： </p>
+<pre><code>create database 库名; 
+</code></pre>
+<p>   指定字符集建库</p>
+<pre><code> CREATE DATABASE `test2` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+</code></pre>
+<p>2:建表： </p>
+<pre><code>use 库名； 
+create table 表名 (字段设定列表)
+</code></pre>
+<p>##删除操作<br>1:删库和删表: </p>
+<pre><code>drop database 库名; 
+drop table 表名； 
+</code></pre>
+<p>   2:清空(删除)表记录： </p>
+<pre><code>DELETE FROM table1
+TRUNCATE TABLE table1
+</code></pre>
+<p>如果DELETE不加WHERE子句，那么它和TRUNCATE TABLE是一样的，但它们有一点不同，那就是DELETE可以返回被删除的记录数，而TRUNCATE TABLE返回的是0。<br>##数据导入导出<br>1、导入导出数据库表：<br>    登陆mysql，选择数据库后选择表导出<br>    导出表</p>
+<pre><code>select * from alarms into outfile &#39;/home/mysql/bak.txt&#39;;
+</code></pre>
+<p>导入备份    </p>
+<pre><code>load data local infile &#39;/home/mysql/bak.txt&#39; into table alarms;
+</code></pre>
+<p>2、导入导出数据库：<br>    登陆mysql，选择数据库后选择表导出<br>    导出数据库</p>
+<pre><code>mysqldump -u用户名 -p密码 数据库名 &gt; 数据库名.sql
+</code></pre>
+<p>导入数据库 (需要先建好数据库,选中数据库(use database) )</p>
+<pre><code>source /home/abc/abc.sql;
+</code></pre>
+<p>##用户操作<br>1:创建用户</p>
+<pre><code>insert into mysql.user(Host,User,Password) values(&#39;localhost&#39;,&#39;waf_alarm&#39;,password(&#39;waf_alarm&#39;));
+</code></pre>
+<p>刷新系统权限表</p>
+<pre><code>flush privileges;
+</code></pre>
+<p>这样就创建了一个名为：waf_alarm 密码为：waf_alarm 的用户。<br>2: 删除用户</p>
+<pre><code>    use mysql;
+    select host,user,password from user;
+    DELETE FROM user WHERE User=&quot;waf_alarm&quot; and Host=&quot;localhost&quot;;
+    flush privileges;
+</code></pre>
+<p>3:修改密码</p>
+<pre><code>update mysql.user set password=password(‘新密码’) where User=waf_alarm and Host=”localhost”;
+flush privileges;
+</code></pre>
+<h2 id="修改默认字符集"><a href="#修改默认字符集" class="headerlink" title="修改默认字符集"></a>修改默认字符集</h2><pre><code>vim/etc/my.cnf
+</code></pre>
+<p>在[client]下添加</p>
+<pre><code>default-character-set=utf8
+</code></pre>
+<p>在[mysqld]下添加</p>
+<pre><code>default-character-set=utf8
+</code></pre>
+<p>9.使得允许远程连接mysql数据库<br>允许mysql的3006端口</p>
+<pre><code>iptables -I INPUT -p tcp --dport 3306 -j ACCEPT
+iptables-save
+service iptables save
+</code></pre>
+<p>登陆mysql数据库 </p>
+<pre><code>mysql -u root -p
+use mysql;
+select host,user,password from user;
+grant all privileges on waf_alarm_db.* to &#39;waf_alarm&#39;@&#39;%&#39; identified by &#39;waf_alarm&#39;;
+flush privileges;
+</code></pre>
+]]></content>
+      <tags>
+        <tag>mysql</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>mysql建数据库</title>
+    <url>/posts/990ad6b3.html</url>
+    <content><![CDATA[<h2 id="新建用户"><a href="#新建用户" class="headerlink" title="新建用户"></a>新建用户</h2><p>登录MYSQL</p>
+<pre><code>mysql -u root -p
+</code></pre>
+<p>创建用户</p>
+<pre><code>insert into mysql.user(Host,User,Password) values(&#39;localhost&#39;,&#39;waf_alarm&#39;,password(&#39;waf_alarm&#39;));
+</code></pre>
+<p>刷新系统权限表</p>
+<pre><code>flush privileges;
+</code></pre>
+<p>这样就创建了一个名为：waf_alarm 密码为：waf_alarm 的用户。</p>
+<p>为用户授权</p>
+<p>登录MYSQL（有ROOT权限）。我里我以ROOT身份登录.</p>
+<pre><code>mysql -u root -p
+</code></pre>
+<p>首先为用户创建一个数据库(waf_alarm_db)</p>
+<pre><code>create database waf_alarm_db;
+</code></pre>
+<p>授权用户拥有waf_alarm_db数据库的所有权限</p>
+<pre><code>grant all privileges on waf_alarm_db.* to &#39;waf_alarm&#39;@&#39;localhost&#39; identified by &#39;waf_alarm&#39;;
+</code></pre>
+<p>刷新系统权限表</p>
+<pre><code>flush privileges;
+</code></pre>
+<p>如果想指定部分权限给一用户，可以这样来写:</p>
+<pre><code>grant select,update on jeecnDB.* to wordpress@localhost identified by &#39;wordpress&#39;;
+</code></pre>
+<p>刷新系统权限表。</p>
+<pre><code>flush privileges;
+grant 权限1,权限2,…权限n on 数据库名称.表名称 to 用户名@用户地址 identified by ‘连接口令’;
+</code></pre>
+<p>权限1,权限2,…权限n代表select,insert,update,delete,create,drop,index,alter,grant,references,reload,shutdown,process,file等14个权限。<br>当权限1,权限2,…权限n被all privileges或者all代替，表示赋予用户全部权限。<br>当数据库名称.表名称被*.*代替，表示赋予用户操作服务器上所有数据库所有表的权限。<br>用户地址可以是localhost，也可以是ip地址、机器名字、域名。也可以用’%’表示从任何地址连接。<br>‘连接口令’不能为空，否则创建失败。</p>
+]]></content>
+      <tags>
+        <tag>mysql</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>SSH端口转发（内网反向链接）</title>
+    <url>/posts/30394258.html</url>
+    <content><![CDATA[<h2 id="开启端口"><a href="#开启端口" class="headerlink" title="开启端口"></a>开启端口</h2><p>linux系统下，81端口一般情况下是关闭的。<br>开启81端口：</p>
+<pre><code>iptables -I INPUT -i eth0 -p tcp --dport 81 -j ACCEPT
+iptables -I OUTPUT -o eth0 -p tcp --sport 81 -j ACCEPT
+</code></pre>
+<p>关闭81端口：</p>
+<pre><code>iptables -I INPUT -i eth0 -p tcp --dport 81 -j DROP
+iptables -I OUTPUT -o eth0 -p tcp --sport 81 -j DROP
+</code></pre>
+<p>然后保存： </p>
+<pre><code>#/etc/rc.d/init.d/iptables save 
+</code></pre>
+<p>再查看是否已经有了： </p>
+<pre><code>[root@vcentos ~]# /etc/init.d/iptables status
+</code></pre>
+<h2 id="在内网B主机上生产公钥和私钥"><a href="#在内网B主机上生产公钥和私钥" class="headerlink" title="在内网B主机上生产公钥和私钥"></a>在内网B主机上生产公钥和私钥</h2><pre><code>ssh-keygen
+...(一直按Enter，最后在~/.ssh/下生成密钥)
+ls ~/.ssh/
+id_rsa id_rsa.pub known_hosts
+</code></pre>
+<h2 id="复制B主机上生成的id-rsa-pub公钥到外网A主机上，并将内容加入到-ssh-authorized-keys中"><a href="#复制B主机上生成的id-rsa-pub公钥到外网A主机上，并将内容加入到-ssh-authorized-keys中" class="headerlink" title="复制B主机上生成的id_rsa.pub公钥到外网A主机上，并将内容加入到~/.ssh/authorized_keys中"></a>复制B主机上生成的id_rsa.pub公钥到外网A主机上，并将内容加入到~/.ssh/authorized_keys中</h2><p>把 id_rsa 私钥复制到路由器中 /root/.ssh 文件夹下</p>
+<pre><code>cat id_rsa.pub &gt;&gt; ~/.ssh/authorized_keys
+</code></pre>
+<p>运行</p>
+<pre><code>autossh -M 5678 -NR 19999:localhost:22 user@23.244.180.54
+</code></pre>
+<p>如果提示错误<br>Agent admitted failure to sign using the key.<br>解决方法：<br>在当前用户下执行命令：</p>
+<pre><code>ssh-add
+</code></pre>
+<p>Centos需要安装autossh<br><a href="http://www.harding.motd.ca/autossh/">http://www.harding.motd.ca/autossh/</a></p>
+<h2 id="在内网机器输入"><a href="#在内网机器输入" class="headerlink" title="在内网机器输入"></a>在内网机器输入</h2><pre><code>autossh -M 5678 -NR 19999:localhost:22 root@myserver_ip
+//autossh -M 5678 -NR 19999:localhost:22 user@23.244.180.54
+///bin/su -c &#39;/usr/bin/autossh -M 5678 -NR 19999:localhost:22 root@23.244.180.54 -p2221&#39; - root
+</code></pre>
+<p>1 修改服务器ssh配置文件，在/etc/ssh/sshd_config中加入下面一句话，为了能够实现全局访问，ssh中 -g参数不知道为什么没有效果，所以只好这么改了。</p>
+<pre><code>GatewayPorts yes  
+
+/etc/init.d/sshd restart
+</code></pre>
+]]></content>
+      <tags>
+        <tag>ssh</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>ssh密钥</title>
+    <url>/posts/8a95400e.html</url>
+    <content><![CDATA[<p>##密钥生成</p>
+<pre><code>ssh-keygen -t rsa
+</code></pre>
+<p>回车即可<br>SSH 秘钥生成结束后，你可以在用户目录 (~/.ssh/) 下看到私钥 id_rsa 和公钥 id_rsa.pub 这两个文件</p>
+<p>##配置authorized_keys实现免密自动登陆<br>复制公钥重命名为authorized_keys,并修改权限为600</p>
+<pre><code>cat id_dsa.pub &gt;&gt; ~/.ssh/authorized_keys
+chmod 600 authorized_keys
+</code></pre>
+<p>将私钥导出到需要采用免密登陆的地方进行配置即可</p>
+]]></content>
+      <tags>
+        <tag>ssh</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LMAP搭建</title>
+    <url>/posts/a3856131.html</url>
+    <content><![CDATA[<h2 id="安装apache"><a href="#安装apache" class="headerlink" title="安装apache"></a>安装apache</h2><pre><code>yum install httpd
+</code></pre>
+<p> Apache配置文件</p>
+<pre><code>vim /etc/httpd/conf/httpd.conf 
+</code></pre>
+<p>添加</p>
+<pre><code>    LoadModule php5_module modules/libphp5.so
+</code></pre>
+<p>启动 Apache  mysql</p>
+<pre><code> service httpd restart 
+ service mysqld restart
+</code></pre>
+<p>This should be changed to whatever you set DocumentRoot to.<br>&lt;Directory “/var/www/html”&gt;</p>
+<h2 id="安装Mysql"><a href="#安装Mysql" class="headerlink" title="安装Mysql"></a>安装Mysql</h2><pre><code>yum install -y mysql-server mysql mysql-deve
+</code></pre>
+<p>初始化</p>
+<pre><code>service mysqld start
+</code></pre>
+<p>给我们的root账号设置密码为system</p>
+<pre><code>mysqladmin -u root password &#39;system&#39;
+</code></pre>
+<h2 id="安装-PHP组件"><a href="#安装-PHP组件" class="headerlink" title="安装 PHP组件"></a>安装 PHP组件</h2><pre><code>yum install php php-devel php-mysql php-gd libjpeg* php-imap php-ldap php-odbc php-pear php-xml php-xmlrpc php-mbstring php-mcrypt php-bcmath php-mhash libmcrypt php-mbstring 
+</code></pre>
+<p>设置开机启动</p>
+<pre><code>chkconfig httpd on 
+chkconfig mysqld on 
+</code></pre>
+<p>重启 MySql  </p>
+<pre><code>service mysqld restart 
+</code></pre>
+<p>重启Apche  </p>
+<pre><code>service httpd restart 
+</code></pre>
+<h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2><p>在/var/www/html/ 下</p>
+<p>新建文件</p>
+<p>##PHPINFO测试<br> wim index.php </p>
+<?php 
+phpinfo(); 
+?><p>##连接数据库测试：</p>
+<p>mysql.php </p>
+<?php  
+$link = mysql_connect("127.0.0.1:3306","root","system"); 
+if($link!=false) {  
+    echo"成功连接mysql服务器"; 
+  } else  {  
+    echo"与本地Mysql服务器连接失败"; 
+  }  
+mysql_close(); 
+?>]]></content>
+      <tags>
+        <tag>php</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>apache乱码配置_默认配置导致页面无法自行设置字符集</title>
+    <url>/posts/5c04c717.html</url>
+    <content><![CDATA[<h2 id="修改默认字符集"><a href="#修改默认字符集" class="headerlink" title="修改默认字符集"></a>修改默认字符集</h2><pre><code>vim /etc/httpd/conf/httpd.conf
+</code></pre>
+<p>修改</p>
+<pre><code>AddDefaultCharset UTF8
+</code></pre>
+<p>为</p>
+<pre><code>AddDefaultCharset Off
+</code></pre>
+]]></content>
+      <tags>
+        <tag>apache</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>apache编译安装</title>
+    <url>/posts/dbd7aa6d.html</url>
+    <content><![CDATA[<p><strong>编译安装apr</strong></p>
+<pre><code>./configure --prefix=/opt/apr-1.5.2
+</code></pre>
+<p><strong>编译安装 apr-util</strong></p>
+<pre><code>./configure --prefix=/opt/apr-util-1.5.4 --with-apr=/opt/apr-1.5.2
+</code></pre>
+<p><strong>编译安装 pcre2</strong></p>
+<pre><code>./configure --prefix=/opt/pcre-8.37
+</code></pre>
+<p><strong>编译安装apache</strong></p>
+<pre><code>./configure --prefix=/opt/httpd-2.4.16 --with-apr=/opt/apr-1.5.2 --with-apr-util=/opt/apr-util-1.5.4 --with-pcre=/opt/pcre-8.37 --enable-shared=max --enable-module=rewirte --enable-module=so --enable-vhost-alias --enable-mods-shared=all --libdir=/usr/lib64
+</code></pre>
+<p>make时如提示以下错误，请创建文件夹复制libapr-1.la(eg./opt/apr-1.5.2/lib/libapr-1)到它指定的目录（eg./opt/lib/）<br><em>//libtool: link: cannot find the library <code>/opt/lib/libapr-1.la&#39; or unhandled argument </code>/opt/lib/libapr-1.la’</em></p>
+<p>修改配置文件</p>
+<pre><code>vim /opt/httpd-2.4.16/conf/httpd.conf
+</code></pre>
+<p>去掉注释</p>
+<pre><code>ServerName www.example.com:80
+</code></pre>
+<p>增加</p>
+<pre><code>LoadModule php5_module modules/libphp5.so
+AddType application/x-httpd-php .php
+</code></pre>
+<p>重启</p>
+<pre><code>/opt/httpd-2.4.16/bin/apachectl restart
+</code></pre>
+<p>将apache添加到开机启动项</p>
+<pre><code>sudo cp /opt/httpd-2.4.16/bin/apachectl /etc/init.d/
+sudo mv /etc/init.d/apachectl /etc/init.d/httpd
+</code></pre>
+<p>这样就能通过</p>
+<pre><code>sudo service httpd start
+</code></pre>
+<p>来启动apache了</p>
+<pre><code>sudo vim /etc/init.d/httpd
+</code></pre>
+<p>添加以下两行注释 使得chkconfig 能够识别脚本</p>
+<pre><code>#!/bin/bash
+#chkconfig:345 61 61
+#description:Apache httpd
+</code></pre>
+<p>chkconfig 指令调用的是init.d目录下的脚本</p>
+<p>所以现在chkonfig httpd on 就能配置开机启动了</p>
+]]></content>
+      <tags>
+        <tag>apache</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>nginx 配置 location 总结及 rewrite 规则写法</title>
+    <url>/posts/5b149824.html</url>
+    <content><![CDATA[<p>以=开头表示精确匹配<br>如 A 中只匹配根目录结尾的请求，后面不能带任何字符串。<br>^~ 开头表示uri以某个常规字符串开头，不是正则匹配<br>~ 开头表示区分大小写的正则匹配;<br>~* 开头表示不区分大小写的正则匹配<br>/ 通用匹配, 如果没有其它匹配,任何请求都会匹配到</p>
+<p>参考地址:</p>
+<blockquote>
+<p><a href="http://seanlook.com/2015/05/17/nginx-location-rewrite/">http://seanlook.com/2015/05/17/nginx-location-rewrite/</a></p>
+</blockquote>
+]]></content>
+      <tags>
+        <tag>nginx</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>pdo_oci oci8 pdo_pgsql扩展编译安装</title>
+    <url>/posts/c3b11a56.html</url>
+    <content><![CDATA[<p>公司用的zend框架开发只能用pdo连接数据库,分别是PGSQL和ORACLE,ORACLE  PDO_OCI的安装比较蛋疼,以下为我自己的安装摘记,免得哪一天我又得干这种恐怖的事情<br><strong>PDO_PGSQL</strong></p>
+<blockquote>
+<p><a href="http://pecl.php.net/package/PDO_PGSQL">http://pecl.php.net/package/PDO_PGSQL</a></p>
+</blockquote>
+<p>checking for pg_config… not found  configure: error: Cannot find libpq-fe.h. Please specify correct PostgreSQL  installation path</p>
+<p>解决方法:<code>yum install  postgresql-devel</code></p>
+<p><strong>安装oracle的底层协议支持</strong></p>
+<pre><code>rpm -ivh oracle-instantclient11.2-basic-11.2.0.2.0.i386.rpm
+
+rpm -ivh oracle-instantclient11.2-devel-11.2.0.2.0.i386.rpm
+</code></pre>
+<p>oracle-instantclient可以到oracle的官方下载。我的系统是32位的，如果是64位系统请下载</p>
+<p>oracle-instantclient11.2-basic-11.2.0.3.0-1.x86_64.rpmoracle-instantclient11.2-devel-11.2.0.3.0-1.x86_64.rpm</p>
+<p><strong>安装oci8的php扩展</strong></p>
+<pre><code>oci8-1.4.10.tgz  
+tar -zxvf oci8-1.4.10.tgz    
+cd oci8-1.4.10
+
+/usr/local/php/bin/phpize CFLAGS=&quot;-I/usr/include/oracle/11.2/client/&quot; CXXFLAGS=&quot;-I/usr/include/oracle/11.2/client/&quot;(注意：如果是64位的系统，client改成client64)
+
+    ./configure --with-php-config=/usr/local/php/bin/php-config --with-oci8=instantclient,/usr/lib/oracle/11.2/client64/lib/
+</code></pre>
+<p><strong>pdo_oci</strong></p>
+<pre><code>./configure --with-php-config=/usr/local/php/bin/php-config --with-pdo-oci=instantclient,/usr,11.2
+</code></pre>
+<ol>
+<li><p>设置oracle的相关参数</p>
+<p>declare -x ORACLE_HOME=”/data/oracle/product”<br>declare -x ORACLE_SID=”product”</p>
+</li>
+</ol>
+<p>其他参考</p>
+<blockquote>
+<p><a href="http://segmentfault.com/a/1190000002722201">http://segmentfault.com/a/1190000002722201</a></p>
+</blockquote>
+<pre><code>./configure --with-php-config=/usr/local/php/bin/php-config --with-pdo-oci=instantclient,/usr/lib/oracle/11.2/client64/lib/
+ ./configure --with-php-config=/usr/local/php/bin/php-config --with-pdo-oci=instantclient,/usr,11.2
+</code></pre>
+]]></content>
+      <tags>
+        <tag>php</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>php使用xdebug性能分析</title>
+    <url>/posts/d35870c7.html</url>
+    <content><![CDATA[<pre><code>phpize
+./configure --enable-xdebug --with-php-config=/usr/local/php/bin/php-config
+make
+make install
+</code></pre>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">vim &#x2F;usr&#x2F;local&#x2F;php&#x2F;etc&#x2F;php.ini</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[Xdebug]</span><br><span class="line">zend_extension&#x3D;xdebug.so</span><br><span class="line">xdebug.profiler_enable&#x3D;on</span><br><span class="line">xdebug.trace_output_dir&#x3D;&quot;&#x2F;root&#x2F;tmp&quot;</span><br><span class="line">xdebug.profiler_output_dir&#x3D;&quot;&#x2F;root&#x2F;tmp&quot;</span><br></pre></td></tr></table></figure>
+
+<pre><code>kill -USR2 `cat /usr/local/php/var/run/php-fpm.pid`
+</code></pre>
+]]></content>
+      <tags>
+        <tag>xdebug</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>php安装扩展_phpize方式</title>
+    <url>/posts/82a61770.html</url>
+    <content><![CDATA[<ol>
+<li><p>进入php编译目录下的ext/插件目录/；</p>
+</li>
+<li><p>根据php安装路径执行/usr/local/php/bin/phpize ；</p>
+</li>
+<li><p>进入目录后执行</p>
+<p> ./configure –with-php-config=/usr/local/php/bin/php-config</p>
+<p>make&amp;&amp;make install</p>
+</li>
+<li><p>修改php配置文件/usr/local/php/etc/php.ini，添加XXXX.so模块。</p>
+<p>extension=pdo_oci.so<br>extension=pdo_pgsql.so</p>
+<p>–with-php-config=/usr/local/php/bin/php-config<br>以及</p>
+<p>/usr/local/php/etc/php.ini</p>
+<p>为你PHP的安装路径和配置路径</p>
+</li>
+</ol>
+]]></content>
+      <tags>
+        <tag>php</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>php知识</title>
+    <url>/posts/51dbc9b9.html</url>
+    <content><![CDATA[<p>##php开启代码错误提示centos环境下</p>
+<pre><code>vim /etc/php.ini
+</code></pre>
+<p>把 <code>display_errors = Off</code> 改为 <code>display_errors = On</code><br>把 <code>error_reporting = xxx</code> 改为 <code>error_reporting = E_ALL | E_STRICT</code></p>
+<p>##PHP 0 和null和false的区别<br>PHP 0 和null和false值相等类型不等！<br>注意：<br>NULL是一种特殊的类型.<br>两种情况下为NULL</p>
+<ol>
+<li>$var = NULL;</li>
+<li>$var;</li>
+<li>0、”0”、NULL以及没有任何属性的对象都将被认为是空的。<br>举例如下：<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$test&#x3D;0;</span><br><span class="line">if($test&#x3D;&#x3D;&#39;&#39;)&#123;</span><br><span class="line"> echo &#39;&lt;br &#x2F;&gt;在php中，0即为空&#39;; &#x2F;&#x2F;被输出</span><br><span class="line">&#125;</span><br><span class="line">if($test&#x3D;&#x3D;&#x3D;&#39;&#39;)&#123;</span><br><span class="line"> echo &#39;&lt;br &#x2F;&gt;在php中，0即为空&#39;; &#x2F;&#x2F;不被输出</span><br><span class="line">&#125;</span><br><span class="line">if($test&#x3D;&#x3D;NULL)&#123;</span><br><span class="line"> echo &#39;&lt;br &#x2F;&gt;在php中，0即为空&#39;; &#x2F;&#x2F;被输出</span><br><span class="line">&#125;</span><br><span class="line">if($test&#x3D;&#x3D;&#x3D;NULL)&#123;</span><br><span class="line"> echo &#39;&lt;br &#x2F;&gt;在php中，0即为空&#39;; &#x2F;&#x2F;不被输出</span><br><span class="line">&#125;</span><br><span class="line">if($test&#x3D;&#x3D;false)&#123;</span><br><span class="line"> echo &#39;&lt;br &#x2F;&gt;在php中，0即为空&#39;; &#x2F;&#x2F;被输出</span><br><span class="line">&#125;</span><br><span class="line">if($test&#x3D;&#x3D;&#x3D;false)&#123;</span><br><span class="line"> echo &#39;&lt;br &#x2F;&gt;在php中，0即为空&#39;; &#x2F;&#x2F;不被输出</span><br><span class="line">&#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure></li>
+</ol>
+]]></content>
+      <tags>
+        <tag>php</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>waf-nginx</title>
+    <url>/posts/5f8b3cbe.html</url>
+    <content><![CDATA[<p>centos5.4 x64 编译安装</p>
+<pre><code>yum install pcre-devel
+
+
+./configure --prefix=/usr/local/nginx --without-http_ssi_module --without-http_geo_module --without-http_map_module --without-http_uwsgi_module --without-http_scgi_module --without-http_proxy_module --without-http_memcached_module --without-http_limit_conn_module --without-http_limit_req_module --without-http_empty_gif_module --with-http_ssl_module --with-ipv6
+
+make
+make install
+</code></pre>
+]]></content>
+      <tags>
+        <tag>nginx</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>waf-php</title>
+    <url>/posts/9af1e0e9.html</url>
+    <content><![CDATA[<p>centos5.4 x64 编译安装</p>
+<pre><code>yum install libpng-devel
+yum install freetype-devel
+
+&#39;./configure&#39;  &#39;--prefix=/usr/local/php&#39; &#39;--with-config-file-path=/etc&#39; &#39;--with-curl&#39; &#39;--with-gd&#39; &#39;--with-ldap=/usr&#39; &#39;--with-mysql&#39; &#39;--with-mysqli=mysqlnd&#39; &#39;--with-libdir=lib64&#39; &#39;--with-freetype-dir=/usr/lib64&#39; &#39;--with-openssl&#39; &#39;--enable-fpm&#39; &#39;--enable-mbstring&#39; &#39;--enable-gd-native-ttf&#39; &#39;--enable-sockets&#39; &#39;--enable-pcntl&#39; &#39;--enable-sysvmsg&#39; &#39;--enable-sysvsem&#39; &#39;--enable-sysvshm&#39; &#39;--disable-cgi&#39; &#39;--disable-short-tags&#39; &#39;--disable-phar&#39;
+
+make
+make install
+cp php.ini-development /etc/php.ini
+</code></pre>
+<p>添加php至系统变量</p>
+<pre><code> sudo vim/etc/profile
+</code></pre>
+<p>在文件末尾添加 </p>
+<pre><code>PATH=$PATH:/PHP_PATH/bin:
+export PATH
+</code></pre>
+<p>执行指令使得修改生效</p>
+<pre><code>source /etc/profile
+</code></pre>
+<p>查看是否配置成功</p>
+<pre><code>echo $PATH
+</code></pre>
+]]></content>
+      <tags>
+        <tag>php</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>使用C编写PHP扩展</title>
+    <url>/posts/71bd7ecd.html</url>
+    <content><![CDATA[<p>###环境:<br>php7.0.2-fpm<br>Linux localhost 2.6.18-164.el5 #1 SMP Thu Sep 3 03:28:30 EDT 2009 x86_64 x86_64 x86_64 GNU/Linux</p>
+<p>C编译出PHP扩展有两种形式<br>•    作为一个可装载模块或者DSO（动态共享对象）<br>•    静态编译到PHP<br>##作为一个可装载模块或者DSO（动态共享对象）<br>通过扩展骨架生成器生成配置文件(位于php源码目录下的ext目录中)，<br>执行<br><code>./ext_skel --extname=myext</code><br>会在ext目录下自动建立扩展目录myext<br>修改myext目录下的config.m4<br><code>vim config.m4</code><br>去掉这3行首的注释标签”dnl”</p>
+<pre><code>PHP_ARG_WITH(myext, for myext support,
+Make sure that the comment is aligned:
+[  --with-myext             Include myext support])
+</code></pre>
+<p>然后在myext目录下 执行</p>
+<pre><code>phpize
+./configure
+make
+make install
+</code></pre>
+<p>配置 php.ini 加入<br><code>extension=myext.so</code><br>重启php-fpm进程<br><code>ps aux | grep php-fpm</code><br><code>kill -USR2 23949</code>（为上一个指令得到的主进程ID号）<br>执行 <code>php -i | grep myext </code><br>有如下输出信息代表扩展安装成功<br><code>myext support =&gt; enabled</code><br>当然，这样得到的是一个没有任何功能的空扩展，要实现功能的话需要修改myext目录下的myext.c，把逻辑功能写进去。<br>##静态编译到PHP<br>现在，先让我们执行一下PHP源码根目录下的./configure –help命令。会发现输出信息并没有包含我们的扩展，这是因为这个configure脚本生成的时候，我们的扩展还没有编写呢。(这个configure是PHP官方分发的。)，所以首先我们需要使用buildconf命令生成新的configure脚本。 $ ./buildconf –force<br>现在当我们再执行./configure –help的时候，便会发现myext扩展的信息已经出现了。现在我们只需要重新走一遍PHP的编译过程，便可以把我们的扩展以静态编译的方式加入到PHP主程序中了。哦，千万不要忘记使用–enable-myext参数开启我们的扩展。</p>
+<p>参考资料:</p>
+<blockquote>
+<p><a href="https://github.com/walu/phpbook">https://github.com/walu/phpbook</a></p>
+</blockquote>
+]]></content>
+      <tags>
+        <tag>php</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>使用php-fpm socket方式连接nginx</title>
+    <url>/posts/aafe2dcc.html</url>
+    <content><![CDATA[<p>环境：<br>php7.0.2<br>nginx-1.9.9<br>centos5.4 x64</p>
+<p>在/dev/shm/目录下建一个文件</p>
+<pre><code> touch /dev/shm/php-fcgi.sock
+</code></pre>
+<p>为其他用户添加写入能力</p>
+<pre><code>sudo    chmod o+w /dev/shm/php-fcgi.sock
+</code></pre>
+<p>修改php配置文件</p>
+<pre><code>cp /usr/local/php/etc/php-fpm.conf.default /usr/local/php/etc/php-fpm.conf
+cp /usr/local/php/etc/php-fpm.d/www.conf.default /usr/local/php/etc/php-fpm.d/www.conf
+</code></pre>
+<p>修改 <a href="http://www.conf(`vim/">www.conf（`vim</a> /usr/local/php/etc/php-fpm.d/<a href="http://www.conf`)/">www.conf`）</a></p>
+<pre><code>;listen =127.0.0.1:9000
+listen =/dev/shm/php-fcgi.sock
+</code></pre>
+<p>在nginx配置文件server新增php配置，将http的方式改为socket方式（<code>vim /usr/local/nginx/conf/nginx.conf</code>）</p>
+<pre><code>    location ~ .*\.php?$ &#123;
+            #fastcgi_pass  127.0.0.1:9000;
+            fastcgi_pass   unix:/dev/shm/php-fcgi.sock;
+            fastcgi_index index.php;
+            include fastcgi.conf;&#125;
+            
+</code></pre>
+<p>避免权限问题修改运行用户</p>
+<pre><code>    #user  nobody;
+    user  root;        
+</code></pre>
+<h2 id="重启php-fpm与nginx"><a href="#重启php-fpm与nginx" class="headerlink" title="重启php-fpm与nginx"></a>重启php-fpm与nginx</h2><p>检测nginx配置文件</p>
+<pre><code>sudo /usr/local/nginx/sbin/nginx -t
+</code></pre>
+<p>重启</p>
+<pre><code>sudo /usr/local/nginx/sbin/nginx -s reload
+</code></pre>
+<hr>
+<p>vim /usr/local/php/etc/php-fpm.conf 去掉里面那个 pid = run/php-fpm.pid 前面的分号生成pid文件(没有的话自行添加)</p>
+<pre><code>[global]
+; Pid file
+; Note: the default prefix is /usr/local/php/var
+; Default Value: none
+pid = run/php-fpm.pid
+</code></pre>
+<p>php-fpm 启动：</p>
+<pre><code>/usr/local/php/sbin/php-fpm
+</code></pre>
+<p>php-fpm 关闭：</p>
+<pre><code>kill -INT `cat /usr/local/php/var/run/php-fpm.pid`
+</code></pre>
+<p>php-fpm 重启：</p>
+<pre><code>kill -USR2 `cat /usr/local/php/var/run/php-fpm.pid`
+</code></pre>
+<hr>
+<pre><code>ls -al /dev/shm
+</code></pre>
+<p>可以看到php-cgi.sock文件unix套接字类型</p>
+<p>#配置中出现的问题：<br>##nginx: [error] open() ＂/usr/local/nginx/logs/nginx.pid＂ failed错误</p>
+<p>解决方法：（使用-c参数指定配置文件）<br>启动nginx</p>
+<pre><code>/usr/local/nginx/sbin/nginx -c /usr/local/nginx/conf/nginx.conf
+</code></pre>
+<p>##本地无法访问虚拟机的nginx服务器</p>
+<p>解决方法：<br>1：虚拟机本地使用links浏览器能打开页面<br>2：lsof -i :80也有进程</p>
+<p>3：能ping通虚拟机Ip的<br>以上三条排除后的原因<br>可能是防火墙端口没打开 </p>
+<pre><code>iptables -I INPUT -p tcp --dport 80 -j ACCEPT 
+iptables-save
+service iptables save
+</code></pre>
+]]></content>
+      <tags>
+        <tag>php</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>UML学习笔记</title>
+    <url>/posts/cc484d2d.html</url>
+    <content><![CDATA[<h2 id="4-1架构视图方法"><a href="#4-1架构视图方法" class="headerlink" title="4+1架构视图方法"></a>4+1架构视图方法</h2><p>Kruchten 提出了一个”4+1”视图模型，从 5 个不同的视角包括包括逻辑试图、进程视图、物理<br>视图、开发视图、场景视图来描述软件体系结构。每一个视图只关心系统的一个侧面，5 个试图<br>结合在一起才能反映系统的软件体系结构的全部内容。如下图：</p>
+<h3 id="逻辑视图（Logic-View-）"><a href="#逻辑视图（Logic-View-）" class="headerlink" title="逻辑视图（Logic View ）"></a>逻辑视图（Logic View ）</h3><p>逻辑试图主要是用来描述系统的功能需求 描述系统的功能需求，即系统提供给 最终用户的服务. 在逻辑视图中，<br>系统分解成一系列的功能抽象、功能分解与功能分析，这些主要来自问题领域（Problem Definition)。<br>在面向对象技术中，通过抽象、封装、继承,可以用对象模型来代表逻辑视图，可以用类图（Class<br>Diagram）来描述逻辑视图。如下图:<br>构件(Components)：类、类服务、参数化类、类层次<br>连接件(Connectors)：关联、包含聚集、使用、继承、实例化</p>
+<h3 id="开发视图（Development-Module-View"><a href="#开发视图（Development-Module-View" class="headerlink" title="开发视图（Development/Module View)"></a>开发视图（Development/Module View)</h3><p>开发视图主要用来描述软件模块的组织与管理 描述软件模块的组织与管理（通过程序库或子系统）。服务于软件 编程人<br>员， 方便后续的设计与实现。它通过系统输入输出关系的模型图和子系统图来描述。要考虑软<br>件的内部需求：开发的难易程度、重用的可能性，通用性，局限性等等。开发视图的风格通常是<br>层次结构，层次越低，通用性越好（底层库：Java SDK，图像处理软件包）。如下图: 构件：模块、<br>子系统、层 连接件：参照相关性、模块/过程调用</p>
+<h3 id="进程视图（Process-View）"><a href="#进程视图（Process-View）" class="headerlink" title="进程视图（Process View）"></a>进程视图（Process View）</h3><p>进程试图侧重系统的 运行特性，关注非功能性的需求（性能，可用性）。服务于 系统集成人<br>员，方便后续性能测试。强调并发性、分布性、集成性、鲁棒性（容错）、可扩充性、吞吐量等。<br>定义逻辑视图中的各个类的具体操作是在哪一个线程（Thread）中被执行。<br>如下图: 构件：进程、简化进程、循环进程<br>连接件：未指定，消息、远程过程调用（RPC）、双向消息、事件广播</p>
+<h3 id="物理视图（Physical-View）"><a href="#物理视图（Physical-View）" class="headerlink" title="物理视图（Physical View）"></a>物理视图（Physical View）</h3><p>物理试图主要描述硬件配置 描述硬件配置。服务于 系统工程人员，解决系统的拓扑结构、系统安装、通信<br>等问题。主要考虑如何把软件映射到硬件上，也要考虑系统性能、规模、可靠性等。可以与进程<br>视图一起映射。如下图:<br>构件：处理器、计算机、其它设备<br>连接件：通信协议等</p>
+<h3 id="场景-Scenarios"><a href="#场景-Scenarios" class="headerlink" title="场景(Scenarios)"></a>场景(Scenarios)</h3><p>场景用于刻画构件之间的相互关系 刻画构件之间的相互关系，将四个视图有机地联系起来。可以描述一个特定的视图<br>内的构件关系，也可以描述不同视图间的构件关系。文本、图形表示皆可。</p>
+<h2 id="UML"><a href="#UML" class="headerlink" title="UML"></a>UML</h2><h3 id="什么是UML"><a href="#什么是UML" class="headerlink" title="什么是UML"></a>什么是UML</h3><p>UML是面向对象设计的建模工具，独立于任何具体程序设计语言。</p>
+<h3 id="UML的作用"><a href="#UML的作用" class="headerlink" title="UML的作用"></a>UML的作用</h3><p>UML用于帮助系统开发人员阐明，展示，构建和记录软件系统的产出<br>UML主要使用图形符号来表示软件项目的设计，使用UML可以帮助项目团队沟通、探索潜在的设计和验证软件的架构设计</p>
+<h3 id="UML静态图分类"><a href="#UML静态图分类" class="headerlink" title="UML静态图分类"></a>UML静态图分类</h3><ul>
+<li><strong>用例图 （ use case diagram ）</strong></li>
+<li><strong>类图（class diagram ）</strong></li>
+<li>组件图 （ component diagram ）</li>
+<li>部署图 （ deployment diagram ）</li>
+<li><del>对象图 （ object diagram ）</del></li>
+<li><del>包图（ package diagram ）</del></li>
+</ul>
+<h3 id="UML动态图分类"><a href="#UML动态图分类" class="headerlink" title="UML动态图分类"></a>UML动态图分类</h3><ul>
+<li><strong>序列图 （sequence diagram ）</strong></li>
+<li>活动图 （ activity diagram ）</li>
+<li>状态图 （ state diagram ）</li>
+<li><del>协作图（ collaboration diagram ）</del></li>
+</ul>
+<h3 id="UML使用注意点"><a href="#UML使用注意点" class="headerlink" title="UML使用注意点"></a>UML使用注意点</h3><p>将UML作为系统蓝图进行设计的时候，1：设计结果必须够完整，做出所有的设计决策，让开发人员不太需要思考，就可以用很直观的方式遵循蓝图写出程序，2：子系统容易有业务上的变更以及设计上的变更发生，所以设计的时候需要提前了解系统哪些部分容易受到需求影响而修改，从而将子系统中容易变动的部分和不易变的部分隔离开</p>
+<h3 id="类图详解"><a href="#类图详解" class="headerlink" title="类图详解"></a>类图详解</h3><p>类图是一种静态UML图，它的应用范围最广，类图用于描述系统中的对象类型，以及存在于它们之间的各种静态关系</p>
+<h3 id="组件图详解"><a href="#组件图详解" class="headerlink" title="组件图详解"></a>组件图详解</h3><p>组件图将正在开发的实际系统分解为各种高级功能。每个组成部分在整个系统中负责一个明确的目标，并且只在需要知道的基础上与其他基本要素相互作用。</p>
+<h4 id="组件符号"><a href="#组件符号" class="headerlink" title="组件符号"></a>组件符号</h4><p>可以在右上角矩形中的小矩形中包含其类型，其中可以包含两个或更多的小矩形。</p>
+<p>需求接口（半圈/插座）代表依赖或必需接口<br>提供接口（圆圈/棒棒糖）表示实现或提供的接口</p>
+]]></content>
+      <tags>
+        <tag>学习笔记</tag>
+        <tag>UML</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>食堂就餐卡系统设计</title>
+    <url>/posts/b96906ea.html</url>
+    <content><![CDATA[<h2 id="系统用例图"><a href="#系统用例图" class="headerlink" title="系统用例图"></a>系统用例图</h2><p><img src="https://raw.githubusercontent.com/wdnb/photo/master/%E7%B3%BB%E7%BB%9F%E7%94%A8%E4%BE%8B%E5%9B%BE.png"></p>
+<h2 id="组件图"><a href="#组件图" class="headerlink" title="组件图"></a>组件图</h2><p><img src="https://raw.githubusercontent.com/wdnb/photo/master/%E7%BB%84%E4%BB%B6%E5%9B%BE.png"></p>
+<h2 id="组件时序图"><a href="#组件时序图" class="headerlink" title="组件时序图"></a>组件时序图</h2><p><img src="https://raw.githubusercontent.com/wdnb/photo/master/%E7%BB%84%E4%BB%B6%E6%97%B6%E5%BA%8F%E5%9B%BE.png"></p>
+<h2 id="部署图"><a href="#部署图" class="headerlink" title="部署图"></a>部署图</h2><p><img src="https://raw.githubusercontent.com/wdnb/photo/master/%E9%83%A8%E7%BD%B2%E5%9B%BE.png"></p>
+]]></content>
+      <tags>
+        <tag>学习笔记</tag>
+        <tag>UML</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>docker配置</title>
+    <url>/posts/f61bf40.html</url>
+    <content><![CDATA[<h2 id="linux安装docker"><a href="#linux安装docker" class="headerlink" title="linux安装docker"></a>linux安装docker</h2><h3 id="官方安装文档"><a href="#官方安装文档" class="headerlink" title="官方安装文档"></a>官方安装文档</h3><blockquote>
+<p><a href="https://docs.docker.com/engine/install/debian/">https://docs.docker.com/engine/install/debian/</a><br>这里用的是脚本一键安装的方案,使用阿里云镜像加速</p>
+</blockquote>
+<p><code>curl -fsSL https://get.docker.com -o get-docker.sh</code></p>
+<p><code>sudo sh get-docker.sh --mirror Aliyun</code></p>
+<h3 id="use-Docker-as-a-non-root-user"><a href="#use-Docker-as-a-non-root-user" class="headerlink" title="use Docker as a non-root user"></a>use Docker as a non-root user</h3><p><code>sudo usermod -aG docker your-user</code></p>
+<h3 id="docker配置镜像加速器-阿里云的需要登录账号获取"><a href="#docker配置镜像加速器-阿里云的需要登录账号获取" class="headerlink" title="docker配置镜像加速器,阿里云的需要登录账号获取"></a>docker配置镜像加速器,阿里云的需要登录账号获取</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo mkdir -p &#x2F;etc&#x2F;docker</span><br><span class="line">sudo tee &#x2F;etc&#x2F;docker&#x2F;daemon.json &lt;&lt;-&#39;EOF&#39;</span><br><span class="line">&#123;</span><br><span class="line">  &quot;registry-mirrors&quot;: [</span><br><span class="line">	&quot;https:&#x2F;&#x2F;hub-mirror.c.163.com&quot;,</span><br><span class="line">    &quot;https:&#x2F;&#x2F;reg-mirror.qiniu.com&quot;]</span><br><span class="line">&#125;</span><br><span class="line">EOF</span><br><span class="line">sudo systemctl daemon-reload</span><br><span class="line">sudo systemctl restart docker</span><br></pre></td></tr></table></figure>
+
+<h2 id="安装-docker-compose"><a href="#安装-docker-compose" class="headerlink" title="安装 docker-compose"></a>安装 docker-compose</h2><p>linuxserver官方地址</p>
+<blockquote>
+<p><a href="https://hub.docker.com/r/linuxserver/docker-compose">https://hub.docker.com/r/linuxserver/docker-compose</a></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo curl -L --fail https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;linuxserver&#x2F;docker-docker-compose&#x2F;master&#x2F;run.sh -o &#x2F;usr&#x2F;local&#x2F;bin&#x2F;docker-compose</span><br><span class="line">sudo chmod +x &#x2F;usr&#x2F;local&#x2F;bin&#x2F;docker-compose</span><br></pre></td></tr></table></figure>
+
+<h2 id="docker-compose-开机启动"><a href="#docker-compose-开机启动" class="headerlink" title="docker-compose 开机启动"></a>docker-compose 开机启动</h2><h3 id="编写debian系开机启动脚本"><a href="#编写debian系开机启动脚本" class="headerlink" title="编写debian系开机启动脚本"></a>编写debian系开机启动脚本</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#!&#x2F;bin&#x2F;bash</span><br><span class="line">### BEGIN INIT INFO</span><br><span class="line"># Default-Start:  2 3 4 5</span><br><span class="line"># Default-Stop: 0 1 6</span><br><span class="line">### END INIT INFO</span><br><span class="line"></span><br><span class="line">cd &#x2F;home&#x2F;pi&#x2F;docker&#x2F;</span><br><span class="line"></span><br><span class="line">docker-compose -f docker-compose.yml up -d</span><br></pre></td></tr></table></figure>
+<p>上传启动脚本到 /etc/init.d 目录下<br><code>cd /etc/init.d</code><br><code>chmod 755 dockerup</code></p>
+<p>#设置开机自启<br><code>sudo update-rc.d dockerup defaults</code></p>
+<p>#删除开机自启<br><code>sudo update-rc.d -f dockerup remove</code></p>
+]]></content>
+      <tags>
+        <tag>docker</tag>
+        <tag>树莓派</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>树莓派配置</title>
+    <url>/posts/cfe260ea.html</url>
+    <content><![CDATA[<h2 id="开启ssh"><a href="#开启ssh" class="headerlink" title="开启ssh"></a>开启ssh</h2><p>将包含 pi4 raspbian 系统的 TF 卡连接到电脑上，在 boot 分区中创建一个空白的名为 ssh 的文件，用于开启 ssh 服务。<br>默认用户名密码是pi@raspberry</p>
+<h2 id="开启wifi"><a href="#开启wifi" class="headerlink" title="开启wifi"></a>开启wifi</h2><p>官方wifi配置方法</p>
+<blockquote>
+<p><a href="https://www.raspberrypi.org/documentation/configuration/wireless/">https://www.raspberrypi.org/documentation/configuration/wireless/</a><br>在 boot 分区创建 wpa_supplicant.conf 文件，用于设置无线网络连接信息，示例如下：</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ctrl_interface&#x3D;DIR&#x3D;&#x2F;var&#x2F;run&#x2F;wpa_supplicant GROUP&#x3D;netdev</span><br><span class="line">update_config&#x3D;1</span><br><span class="line">country&#x3D;CN</span><br><span class="line"></span><br><span class="line">network&#x3D;&#123;</span><br><span class="line"> ssid&#x3D;&quot;&lt;Name of your wireless LAN&gt;&quot;</span><br><span class="line"> psk&#x3D;&quot;&lt;Password for your wireless LAN&gt;&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="树莓派更换源"><a href="#树莓派更换源" class="headerlink" title="树莓派更换源"></a>树莓派更换源</h2><h3 id="树莓派基金会提供的源"><a href="#树莓派基金会提供的源" class="headerlink" title="树莓派基金会提供的源"></a>树莓派基金会提供的源</h3><p>/etc/apt/sources.list.d/raspi.list里的软件源是树莓派基金会单独（非Raspbian开发者）提供/维护的软件源，主要包括raspi-config、minecraftpi、树莓派桌面环境、内核固件驱动等少量软件。<br>这个软件源相关资料比较少，国内目前只有清华（201709开始提供）和中科大有提供</p>
+<h3 id="Raspbian源"><a href="#Raspbian源" class="headerlink" title="Raspbian源"></a>Raspbian源</h3><p>raspbian这个源是由独立开发者维护的，与树莓派基金会并无直接联系。国内源比较多，选择一个与自己延迟最小或连接速度最好或物理距离最短的即可。<br>无需担心各个软件源内容上会有不同，基本上各个站点每天都会同步一次，绝大部分情况下某软件安装不了与用了哪个站点提供的源无关。<br>通常位于/etc/apt/sources.list</p>
+<p>我用了阿里的raspbian源和清华的raspi源因为阿里没有raspi源</p>
+<h3 id="阿里源"><a href="#阿里源" class="headerlink" title="阿里源"></a>阿里源</h3><blockquote>
+<p><a href="https://developer.aliyun.com/mirror/raspbian">https://developer.aliyun.com/mirror/raspbian</a></p>
+</blockquote>
+<h3 id="清华源"><a href="#清华源" class="headerlink" title="清华源"></a>清华源</h3><blockquote>
+<p><a href="https://mirrors.tuna.tsinghua.edu.cn/help/raspbian/">https://mirrors.tuna.tsinghua.edu.cn/help/raspbian/</a></p>
+</blockquote>
+<h3 id="raspbian镜像官方列表"><a href="#raspbian镜像官方列表" class="headerlink" title="raspbian镜像官方列表"></a>raspbian镜像官方列表</h3><blockquote>
+<p><a href="https://www.raspbian.org/RaspbianMirrors">https://www.raspbian.org/RaspbianMirrors</a></p>
+</blockquote>
+<h3 id="编辑-etc-apt-sources-list-文件，删除原文件所有内容，用以下内容取代："><a href="#编辑-etc-apt-sources-list-文件，删除原文件所有内容，用以下内容取代：" class="headerlink" title="编辑 /etc/apt/sources.list 文件，删除原文件所有内容，用以下内容取代："></a>编辑 <code>/etc/apt/sources.list</code> 文件，删除原文件所有内容，用以下内容取代：</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">deb https:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;raspbian&#x2F;raspbian&#x2F; buster main non-free contrib</span><br><span class="line">deb-src https:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;raspbian&#x2F;raspbian&#x2F; buster main non-free contrib</span><br></pre></td></tr></table></figure>
+<h3 id="编辑-etc-apt-sources-list-d-raspi-list-文件，删除原文件所有内容，用以下内容取代："><a href="#编辑-etc-apt-sources-list-d-raspi-list-文件，删除原文件所有内容，用以下内容取代：" class="headerlink" title="编辑 /etc/apt/sources.list.d/raspi.list 文件，删除原文件所有内容，用以下内容取代："></a>编辑 <code>/etc/apt/sources.list.d/raspi.list</code> 文件，删除原文件所有内容，用以下内容取代：</h3><p><code>deb http://mirrors.tuna.tsinghua.edu.cn/raspberrypi/ buster main ui</code></p>
+<h2 id="修改主机名称"><a href="#修改主机名称" class="headerlink" title="修改主机名称"></a>修改主机名称</h2><p><code>sudo vim /etc/hostname</code><br>删去原有主机名 填入自己想要的主机名</p>
+<h2 id="添加hosts域名和ip对应关系"><a href="#添加hosts域名和ip对应关系" class="headerlink" title="添加hosts域名和ip对应关系"></a>添加hosts域名和ip对应关系</h2><p><code>vim /etc/hosts</code><br><code>127.0.0.1 pi8g</code></p>
+<h2 id="配置静态ip"><a href="#配置静态ip" class="headerlink" title="配置静态ip"></a>配置静态ip</h2><p>官方文档</p>
+<blockquote>
+<p><a href="https://www.raspberrypi.org/documentation/configuration/tcpip/README.md">https://www.raspberrypi.org/documentation/configuration/tcpip/README.md</a></p>
+</blockquote>
+<p><code>sudo vim /etc/dhcpcd.conf</code><br>routers是DHCP服务器的ip,设置ip_address的时候要注意不要超出路由器网段</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">interface wlan0</span><br><span class="line">static ip_address&#x3D;10.0.0.80&#x2F;24    </span><br><span class="line">static routers&#x3D;10.0.0.1</span><br><span class="line">static domain_name_servers&#x3D;10.0.0.1 8.8.8.8</span><br></pre></td></tr></table></figure>
+
+<h2 id="Can’t-set-locale-make-sure-LC-and-LANG-are-correct"><a href="#Can’t-set-locale-make-sure-LC-and-LANG-are-correct" class="headerlink" title="Can’t set locale; make sure $LC_* and $LANG are correct!"></a>Can’t set locale; make sure $LC_* and $LANG are correct!</h2><p>Debian以源代码形式发布语言环境。它们需要显式编译。这样做的原因是，编译后的语言环境会使用更多的磁盘空间，但是大多数人只会使用其中的一些。<br>执行<code>sudo dpkg-reconfigure locales</code>选择自己想要的字符集</p>
+<p>然后使用 tab 选中 ok </p>
+<h2 id="树莓派升级最新内核"><a href="#树莓派升级最新内核" class="headerlink" title="树莓派升级最新内核"></a>树莓派升级最新内核</h2><p><code>sudo apt-get install --reinstall raspberrypi-bootloader raspberrypi-kernel</code></p>
+<p>查看已安装内核<br><code>ls /lib/modules</code></p>
+<h2 id="查看树莓派温度"><a href="#查看树莓派温度" class="headerlink" title="查看树莓派温度"></a>查看树莓派温度</h2><p><code>/opt/vc/bin/vcgencmd measure_temp</code></p>
+]]></content>
+      <tags>
+        <tag>树莓派</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>centos安装nodejs</title>
+    <url>/posts/367c0bbd.html</url>
+    <content><![CDATA[<h2 id="编译安装"><a href="#编译安装" class="headerlink" title="编译安装"></a>编译安装</h2><pre><code># yum install openssl-devel
+# cd /usr/local/src
+# wget http://nodejs.org/dist/node-latest.tar.gz
+# tar zxvf node-latest.tar.gz
+(cd into extracted folder: ex &quot;cd node-v0.10.3&quot;)
+# ./configure
+# make
+# make install
+</code></pre>
+<p>Note that this requires Python 2.6+ to use ./configure above. You can modify the “configure” file to point to python2.7 in line 1 if necessary.</p>
+<p>To create an RPM package, you can use FPM:</p>
+<pre><code># wget http://nodejs.org/dist/node-latest.tar.gz
+# tar zxvf node-latest.tar.gz
+(cd into extracted folder: ex &quot;cd node-v0.10.3&quot;)
+# ./configure --prefix=/usr/
+# make
+# mkdir /tmp/nodejs
+# make install DESTDIR=/tmp/nodejs/
+# tree -L 3 /tmp/nodejs/
+/tmp/nodejs/
+└── usr
+    ├── bin
+    │   ├── node
+    │   ├── node-waf
+    │   └── npm -&gt; ../lib/node_modules/npm/bin/npm-cli.js
+    ├── include
+    │   └── node
+    ├── lib
+    │   ├── dtrace
+    │   ├── node
+    │   └── node_modules
+    └── share
+        └── man
+</code></pre>
+<p>Now make the nodejs package:</p>
+<pre><code># fpm -s dir -t rpm -n nodejs -v 0.8.18 -C /tmp/nodejs/ usr/bin usr/lib
+Then install and check the version:
+
+# rpm -ivh nodejs-0.8.18-1.x86_64.rpm 
+Preparing...                ########################################### [100%]
+   1:nodejs                 ########################################### [100%]
+
+# /usr/bin/node --version
+v0.8.18
+Source: https://github.com/jordansissel/fpm/wiki/PackageMakeInstall
+</code></pre>
+]]></content>
+      <tags>
+        <tag>node.js</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>git指令</title>
+    <url>/posts/b56cf41b.html</url>
+    <content><![CDATA[<p>获取github上的项目</p>
+<pre><code>git clone 项目地址
+</code></pre>
+<p>切换分支</p>
+<pre><code>git checkout &#39;branchName&#39;
+</code></pre>
+<p>从远程更新代码到本地</p>
+<pre><code>git pull
+</code></pre>
+<p>添加代码到索引</p>
+<pre><code>git add .
+</code></pre>
+<p>提交</p>
+<pre><code>git commit -m &#39;update&#39;
+</code></pre>
+<p>更新至远程</p>
+<pre><code>git push origin master    
+</code></pre>
+<p>查看提交纪录</p>
+<pre><code>git log
+git log -p xxxxxxxxxxxxxxxxx
+</code></pre>
+<p>回退更改</p>
+<pre><code>git reset xxxxxxxxxxxxxxxxx
+</code></pre>
+<p>删除Git仓库所有提交历史记录，成为一个干净的新仓库</p>
+<p>Checkout</p>
+<pre><code>git checkout --orphan latest_branch
+</code></pre>
+<p>   Add all the files</p>
+<pre><code>git add -A
+</code></pre>
+<p>Commit the changes</p>
+<pre><code>git commit -am &quot;commit message&quot;
+</code></pre>
+<p>Delete the branch</p>
+<pre><code>git branch -D master
+</code></pre>
+<p>Rename the current branch to master</p>
+<pre><code>git branch -m master
+</code></pre>
+<p>Finally, force update your repository</p>
+<pre><code>git push -f origin master
+</code></pre>
+<p>参考地址:</p>
+<blockquote>
+<p><a href="https://stackoverflow.com/questions/13716658/how-to-delete-all-commit-history-in-github">https://stackoverflow.com/questions/13716658/how-to-delete-all-commit-history-in-github</a></p>
+</blockquote>
+<p>git add -A 和 git add . 的区别</p>
+<p>Git Version 1.x: </p>
+<p><img src="/git%E6%8C%87%E4%BB%A4/git1.jpg"></p>
+<p>Git Version 2.x: </p>
+<p><img src="/git%E6%8C%87%E4%BB%A4/git2.jpg"></p>
+]]></content>
+      <tags>
+        <tag>git</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>vagrant</title>
+    <url>/posts/de5b77c1.html</url>
+    <content><![CDATA[<p>制作自己的vagrant box</p>
+<p>事先工作:<br>1.安装VirtualBox<br>2.安装Vagrant<br>3.在VirtualBox中安装操作系统，例如 CentOS</p>
+<p>1.创建vagrant用户和用户目录，密码为vagrant<br>2.添加vagrant用户的公共密钥，文件为/home/vagrant/.ssh/authorized_keys(权限要为600)<br>3.密钥生成和authorized_keys配置可参考:  <a href="http://blog.jbface.com/post/linux/sshmi-yao">ssh密钥生成</a><br>4.在宿主机中执行vagrant package –base 虚拟机名称，这样会创建指定虚拟机的box<br>5.将制作好的Box添加到Vagrant环境中，vagrant box add name package.box<br>6.初始化运行环境,vagrant init name<br>7.运行Vagrant虚拟机，vagrant up<br>8.将上面生成的私钥私钥放置在宿主机目录下<br>在配置文件Vagrantfile新增以下2行配置(此文件在vagrant init后生成)</p>
+<pre><code>config.ssh.private_key_path = &#39;./id_rsa&#39;
+config.ssh.forward_agent = true
+</code></pre>
+<p><a href="https://github.com/astaxie/Go-in-Action/blob/master/ebook/zh/01.3.md">vagrant使用教程</a></p>
+<p>##vagrant错误处理<br>###No guest additions<br>    default: No guest additions were detected on the base box for this VM! Guest<br>    default: additions are required for forwarded ports, shared folders, host only<br>    default: networking, and more. If SSH fails on this machine, please install<br>    default: the guest additions and repackage the box to continue.<br>宿主机下执行,(可能会等待很长时间)</p>
+<pre><code>vagrant plugin install vagrant-vbguest
+</code></pre>
+]]></content>
+      <tags>
+        <tag>vagrant</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>vim常用指令</title>
+    <url>/posts/d436f53.html</url>
+    <content><![CDATA[<p>vim 批量替换</p>
+<pre><code>:from,tos/old/new/g
+</code></pre>
+<p>from是起始行</p>
+<p>to是终止行用$表示到文件最后一行</p>
+<p>s是替换的意思</p>
+<p>old是想被替换的文本</p>
+<p>new是你的新文本</p>
+<p>g表示全局</p>
+<p>例如:</p>
+<pre><code>:1,$s/yanyan/amy/g
+</code></pre>
+<p>就是将一个文件的第一行到最后一行，也就是整个文件的yanyan这个字串替换成amy</p>
+<p>设置行号</p>
+<pre><code>:set number
+</code></pre>
+]]></content>
+      <tags>
+        <tag>vim</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>正则</title>
+    <url>/posts/73169f18.html</url>
+    <content><![CDATA[<p>使用小括号()指定一个子表达式后，匹配这个子表达式的文本(也就是此分组捕获的内容)可以在表达式或其它程序中作进一步的处理。默认情况下，每个分组会自动拥有一个组号，规则是：从左向右，以分组的左括号为标志，第一个出现的分组的组号为1，第二个为2，以此类推。</p>
+<p>^和$分别代表字符串的开始和结束，匹配一串长度为5~12位的qq如^\d{5,12}$</p>
+<p> \b代表单词边界，其前后必须是不同类型的字符，可以组成单词的字符为一种类型，不可组成单词的字符(包括字符串的开始和结束）为另一种类型<br>因此\b\d\b可以匹配”%3%”中的3,但不能匹配”23”中的任意一个数字</p>
+<p>字符转义<br>如果你想查找元字符本身比如查找.或者*需要添加\转义符查找\就是\</p>
+<p>分组（用来重复一组字符）<br>你可以用小括号来指定子表达式(也叫做分组)，然后你就可以指定这个子表达式的重复次数了，你也可以对子表达式进行其它一些操作如下面匹配一组<br>ip 192.168.1.1<br>((2[0-4]\d|25[0-5]|[01]?\d\d?).){3}(2[0-4]\d|25[0-5]|[01]?\d\d?)<br>([01]?\d\d?|2[0-4]\d|25[0-5].){3}<br>常用正则示例</p>
+<p><img src="%E6%AD%A3%E5%88%99/1.png"></p>
+<p><img src="%E6%AD%A3%E5%88%99/2.png"></p>
+<p><img src="%E6%AD%A3%E5%88%99/3.png"></p>
+<p><img src="%E6%AD%A3%E5%88%99/4.png"></p>
+<p><img src="%E6%AD%A3%E5%88%99/5.png"></p>
+<p><img src="%E6%AD%A3%E5%88%99/6.png"></p>
+<p><img src="%E6%AD%A3%E5%88%99/7.png"></p>
+]]></content>
+      <tags>
+        <tag>RegEx</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>证书格式转换</title>
+    <url>/posts/69cb5da7.html</url>
+    <content><![CDATA[<p>##PEM Format<br>The PEM format is the most common format that Certificate Authorities issue certificates in. PEM certificates usually have extentions such as .pem, .crt, .cer, and .key. They are Base64 encoded ASCII files and contain “—–BEGIN CERTIFICATE—–” and “—–END CERTIFICATE—–” statements. Server certificates, intermediate certificates, and private keys can all be put into the PEM format.<br>Apache and other similar servers use PEM format certificates. Several PEM certificates, and even the private key, can be included in one file, one below the other, but most platforms, such as Apache, expect the certificates and private key to be in separate files.<br>##DER Format<br>The DER format is simply a binary form of a certificate instead of the ASCII PEM format. It sometimes has a file extension of .der but it often has a file extension of .cer so the only way to tell the difference between a DER .cer file and a PEM .cer file is to open it in a text editor and look for the BEGIN/END statements. All types of certificates and private keys can be encoded in DER format. DER is typically used with Java platforms. The SSL Converter can only convert certificates to DER format. If you need to convert a private key to DER, please use the OpenSSL commands on this page.<br>##PKCS#7/P7B Format<br>The PKCS#7 or P7B format is usually stored in Base64 ASCII format and has a file extention of .p7b or .p7c. P7B certificates contain “—–BEGIN PKCS7—–” and “—–END PKCS7—–” statements. A P7B file only contains certificates and chain certificates, not the private key. Several platforms support P7B files including Microsoft Windows and Java Tomcat.<br>##PKCS#12/PFX Format<br>The PKCS#12 or PFX format is a binary format for storing the server certificate, any intermediate certificates, and the private key in one encryptable file. PFX files usually have extensions such as .pfx and .p12. PFX files are typically used on Windows machines to import and export certificates and private keys.<br>When converting a PFX file to PEM format, OpenSSL will put all the certificates and the private key into a single file. You will need to open the file in a text editor and copy each certificate and private key (including the BEGIN/END statments) to its own individual text file and save them as certificate.cer, CACert.cer, and privateKey.key respectively.<br>OpenSSL Commands to Convert SSL Certificates on Your Machine<br>It is highly recommended that you convert to and from .pfx files on your own machine using OpenSSL so you can keep the private key there. Use the following OpenSSL commands to convert SSL certificate to different formats on your own machine:<br>##OpenSSL Convert PEM<br>###Convert PEM to DER</p>
+<pre><code>openssl x509 -outform der -in certificate.pem -out certificate.der
+</code></pre>
+<p>##Convert PEM to P7B</p>
+<pre><code>openssl crl2pkcs7 -nocrl -certfile certificate.cer -out certificate.p7b -certfile CACert.cer
+</code></pre>
+<p>##Convert PEM to PFX</p>
+<pre><code>openssl pkcs12 -export -out certificate.pfx -inkey privateKey.key -in certificate.crt -certfile CACert.crt
+</code></pre>
+<p>##OpenSSL Convert DER<br>###Convert DER to PEM</p>
+<pre><code>openssl x509 -inform der -in certificate.cer -out certificate.pem
+</code></pre>
+<p>##OpenSSL Convert P7B<br>###Convert P7B to PEM</p>
+<pre><code>openssl pkcs7 -print_certs -in certificate.p7b -out certificate.cer
+</code></pre>
+<p>##Convert P7B to PFX</p>
+<pre><code>openssl pkcs7 -print_certs -in certificate.p7b -out certificate.cer
+openssl pkcs12 -export -in certificate.cer -inkey privateKey.key -out certificate.pfx -certfile CACert.cer
+</code></pre>
+<p>##OpenSSL Convert PFX<br>###Convert PFX to PEM</p>
+<pre><code>openssl pkcs12 -in certificate.pfx -out certificate.cer -nodes
+</code></pre>
+<p>##tmocat的jks转换<br>###Convert JKS to PFX<br>    keytool -list -v -keystore  C:\QQ.jks -storepass 111111</p>
+<pre><code>keytool -importkeystore -srckeystore C:\QQ.jks -destkeystore my.p12 -srcstoretype JKS -deststoretype PKCS12  -srcstorepass 111111 -deststorepass 123456 -srcalias 1.1.1.1 -destalias myalias -srckeypass 111111 -destkeypass 123456 -noprompt
+</code></pre>
+]]></content>
+      <tags>
+        <tag>ca</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>证书链验证方法</title>
+    <url>/posts/89f66ba9.html</url>
+    <content><![CDATA[<p>证书里有2个信息 issuer与subject, 然后证书链其实就是很多个证书,首先获取证书的issuer,和证书链条第一条的subject,如果两个信息相同那么取第一条证书的issuer然后继续匹配第二条证书的subject…循环直到最后一条,如果都相同就验证通过,如果有一环不同就验证不通过</p>
+]]></content>
+      <tags>
+        <tag>ca</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>games</title>
+    <url>/posts/ff232b31.html</url>
+    <content><![CDATA[<p>石油骚动<br>最终幻想15<br>欧陆风云<br>钢铁雄心<br>骑马与砍杀<br>维多利亚<br>战锤<br>elona<br>饥荒<br>矮人要塞<br>reus<br>这是我的战争<br>孢子<br>死亡独轮车<br>信长之野望<br>逆转裁判<br>战锤40k战争黎明2<br>银河文明3<br>最高指挥官<br>家园重制收藏版<br>星球基地<br>外星贸易公司<br>战锤3<br>文明6</p>
+]]></content>
+      <tags>
+        <tag>note</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>movies</title>
+    <url>/posts/c61eed30.html</url>
+    <content><![CDATA[<p>德哥&amp;贝爷<br>50度灰<br>美国狙击手<br>疯狂的麦克斯4<br>但丁密码<br>发条橙<br>2001太空漫游<br>2010:太空奥德赛<br>发条橙<br>奇异博士<br>降临(Arrival)<br>血战钢锯岭<br>萨利机长<br>闻香识女人<br>子宫日记<br>年鉴计划<br>##剧集<br>火线<br>马男波杰克<br>暗黑的破坏神<br>狼辛<br>黑镜<br>无人生还<br>美国恐怖故事<br>僵尸国度<br>真探<br>火线<br>冰血暴<br>冰与火之歌:王权纷争<br>神秘博士<br>##已阅<br>甲铁城<br>the night of 罪恶之夜/罪夜之谜</p>
+]]></content>
+      <tags>
+        <tag>note</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>read</title>
+    <url>/posts/98574167.html</url>
+    <content><![CDATA[<p>野性的呼唤<br>午夜的另一面<br>自卑与超越的概念</p>
+]]></content>
+      <tags>
+        <tag>note</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>人生的真谛</title>
+    <url>/posts/11984895.html</url>
+    <content><![CDATA[<p>![](人生的真谛/你好 人类.png)</p>
+]]></content>
+      <tags>
+        <tag>note</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>从bitcron连夜逃回hexo</title>
+    <url>/posts/3b3103a4.html</url>
+    <content><![CDATA[<p>我的文章成功的被farbox or bitcron 这个付费博客托管商的程序bug弄没了<br>17.3月后至今的文章全没了，只剩下17.3月前的备份了，虽然就丢了几十篇的流水账，但是总归是让人不爽的，指不定哪天查问题要用到那消失在空气里的文章，重新去网上大海捞针 多不爽吖<br>牢记历史，警醒未来<br>事情经过<br>前几日闲的蛋疼想把blog的文章拉到本地做个备份，因为本地的文章之前被删了，<br>然而采用bitcron提供的MarkEditor将文章拉回本地时却只拉回了这种jb玩意儿</p>
+<p><img src="/%E4%BB%8Ebitcron%E8%BF%9E%E5%A4%9C%E9%80%83%E5%9B%9Ehexo/ME1.png"></p>
+<p><img src="/%E4%BB%8Ebitcron%E8%BF%9E%E5%A4%9C%E9%80%83%E5%9B%9Ehexo/ME2.png"></p>
+<p>当时我心里就咯噔一下，得，我特么遇到bug了。这种手工作坊的产品出bug我是丝毫都不奇怪<br>好吧 那我就换个方式拉文件，用将文件同步到dropbox上<br>这次我又碰到了这个</p>
+<p><img src="/%E4%BB%8Ebitcron%E8%BF%9E%E5%A4%9C%E9%80%83%E5%9B%9Ehexo/DB.png"><br>是的，真刺激，所有文章都变成了空白文件 只有文件名了。</p>
+<p>于是乎我本能的将dropbox的空白文章删除<br>嗯<br>删除操作同步到了我的博客 我的文章就此全部丢失<br>而后和博客托管商发邮件沟通，回复的都是一些然并卵的内容，我不知道是我描述问题的能力太差还是他理解能力太差，鸡同鸭讲</p>
+<p>我：请问bitcron文件有备份嘛，求求你发给我文件备份（此处交代事情起因经过结果）<br>托管商：bitcron文件有备份的<br>我：求求你发给我文件备份<br>托管商：你可以从farbox同步到bitcron再同步到MarkEditor<br>我：求求你发给我文件备份<br>托管商：你可以同步到dropbox<br>我：我遇到bug了，求求你发给我文件备份<br>托管商：我这边显示没问题<br>我：。。。</p>
+<p>我犯了几个致命的错误<br>1：信任付费博客托管商bitcron（永远不要相信他人不会出篓子）<br>2:  文章本地备份没做好（永远要留一手）<br>3：瞎jb操作（永远要想清楚再动手）</p>
+<p>但是这个锅我是必须要丢博客托管商上的，是你们平台的BUG导致直接导致的我文章丢失，我文章没有备份好只是客观原因，好歹你这个博客我是付费购买的服务，还在你那里买了markeditor，还是抱着支持你的天真想法，我真是大错特错，吃一堑长一智，此后不会再犯同样的错误了。<br>bitcron，故事讲的很多，产品做的并不好，BYE~<br>hexo，阔别4年多我又回来了~</p>
+]]></content>
+      <tags>
+        <tag>note</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>几个一本正经活说八道的冷笑话...</title>
+    <url>/posts/877ae283.html</url>
+    <content><![CDATA[<p>1.德国的钢材放入浓硫酸里都难以被腐蚀，浸了几个小时还是基本完好如初，反观中国的钢材，在稀硫酸里浸一会就已经被溶解的不成样子了。我们需要追赶的地方太多了。</p>
+<p>2.中国的大理石质量堪忧！只是泼盐酸就会放出大量的气泡，让我们怎么安心使用！这个国家怎么了！</p>
+<p>3.众所周知，双氧水能杀菌消毒，它会在有细菌的创口处形成气泡。可是中国的猪肝，放入双氧水中，放出气泡竟然无比剧烈，甚至让整瓶双氧水都变成了水。</p>
+<p>4.在澳洲还春意盎然的时候，中国的大部分的树的叶子都已经掉光了，这说明了中国的空气质量有多么糟糕。</p>
+<p>5.转基因食品存在巨大危害，在一家用转基因大米做午餐的学校内竟然有30%的学生没有男性生殖器！</p>
+<p>6.中国市面上售卖食盐中的钠含量严重超标，每一百克食盐的钠含量竟然超过了人体每日所需量的12倍！</p>
+<p>7、动物实验表明，转基因食品有巨大危害，给小白鼠注射了转基因大米悬浊液之后，小白鼠立即死亡。<br>8、把人的红细胞放入中国市面上的纯净水里，人的红细胞不久便爆裂死亡，现在中国的矿泉</p>
+<p>水质量能让人信任吗？</p>
+<p>9.向兔子静脉中注入10ml空气，兔子居然死亡！中国空气质量差到了何等地步！</p>
+]]></content>
+      <tags>
+        <tag>note</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>树莓派安装方法</title>
+    <url>/posts/b707cf9f.html</url>
+    <content><![CDATA[<p>树莓派安装方法<br>Sd卡插入电脑<br>确认挂载点</p>
+<pre><code>diskutil list
+</code></pre>
+<p>卸载sd卡</p>
+<pre><code>diskutil unmountDisk /dev/diskxx
+sudo dd bs=4m if=raspberry.img of=/dev/rdiskxx
+</code></pre>
+<p>开启ssh方法<br>读取sd卡在根目录中建立一个名为ssh的空文件</p>
+<pre><code>ssh pi@10.0.0.6 
+</code></pre>
+<p>密码：raspberry</p>
+<p>更换源</p>
+<pre><code>sudo vi /etc/apt/sources.list
+</code></pre>
+<p>修改为</p>
+<pre><code>deb http://mirrors.tuna.tsinghua.edu.cn/raspbian/raspbian/ jessie main non-free contrib
+deb-src http://mirrors.tuna.tsinghua.edu.cn/raspbian/raspbian/ jessie main non-free contrib
+
+
+sudo apt-get update #更新系统软件
+sudo apt-get upgrade  #更新已安装的包
+</code></pre>
+<p>安装vim</p>
+<pre><code>sudo apt-get remove vim-common
+sudo apt-get install vim
+</code></pre>
+<p><code>sudo vim /etc/vim/vimrc</code>文件，在末尾添加以下内容</p>
+<pre><code>set nu 
+syntax on 
+set tabstop=4
+</code></pre>
+<p>开启vnc</p>
+<pre><code>sudo raspi-config
+</code></pre>
+<p>端口为1，用户名密码和ssh的一致<br>10.0.0.6:1</p>
+<p>开通root</p>
+<pre><code>sudo passwd root
+sudo passwd --unlock root
+sudo vim /etc/ssh/sshd_config
+</code></pre>
+<p>修改 PermitRootLogin without-password 为 PermitRootLogin yes<br>重启ssh</p>
+<pre><code>service ssh restart
+</code></pre>
+<p>配置无线固定ip<br>1:</p>
+<pre><code>sudo vim /etc/network/interfaces
+</code></pre>
+<p>在<br>source-directory /etc/network/interfaces.d<br>下面添加</p>
+<pre><code>auto lo
+iface lo inet loopback
+
+iface eth0 inet manual
+
+allow-hotplug wlan0
+auto wlan0
+iface wlan0 inet manual
+
+wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
+</code></pre>
+<p>2:</p>
+<pre><code>sudo vim /etc/wpa_supplicant/wpa_supplicant.conf
+</code></pre>
+<p>末尾添加</p>
+<pre><code>network=&#123;
+        ssid=&quot;NETGEAR52&quot;
+        psk=192eccecb8013eefe14a2ab9a9e228379bcb0563243cd263b5c0a7bafe380aba
+&#125;
+</code></pre>
+<p>3:(有线ip也这样添加，修改interface即可)</p>
+<pre><code>sudo vim /etc/dhcpcd.conf
+</code></pre>
+<p>末尾添加<br>注意ip网段</p>
+<pre><code>interface wlan0
+static ip_address=10.0.0.10/24
+static routers=10.0.0.1
+static domain_name_servers=10.0.0.1
+</code></pre>
+<p>4:<br>重启设备</p>
+<p>终端配色：</p>
+<pre><code>cp /home/pi/.bashrc /root
+</code></pre>
+]]></content>
+      <tags>
+        <tag>note</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>gitlab和gitlab-runner配置 https 自签证书</title>
+    <url>/posts/1a5a0bd0.html</url>
+    <content><![CDATA[<h2 id="gitlab配置https"><a href="#gitlab配置https" class="headerlink" title="gitlab配置https"></a>gitlab配置https</h2><h3 id="生成自签证书"><a href="#生成自签证书" class="headerlink" title="生成自签证书"></a>生成自签证书</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#秘钥脚本，将以下内容保存为shell脚本，然后运行</span><br><span class="line">#出现提示输入信息的地方输入信息，先输入域名然后4次证书密码，任意密码，四次保持一致。</span><br><span class="line"></span><br><span class="line">#!&#x2F;bin&#x2F;sh</span><br><span class="line"></span><br><span class="line"># create self-signed server certificate:</span><br><span class="line"></span><br><span class="line">read -p &quot;Enter your domain [139.199.125.93]: &quot; DOMAIN</span><br><span class="line"></span><br><span class="line">echo &quot;Create server key...&quot;</span><br><span class="line"></span><br><span class="line">openssl genrsa -des3 -out $DOMAIN.key 2048</span><br><span class="line"></span><br><span class="line">echo &quot;Create server certificate signing request...&quot;</span><br><span class="line"></span><br><span class="line">SUBJECT&#x3D;&quot;&#x2F;C&#x3D;US&#x2F;ST&#x3D;Mars&#x2F;L&#x3D;iTranswarp&#x2F;O&#x3D;iTranswarp&#x2F;OU&#x3D;iTranswarp&#x2F;CN&#x3D;$DOMAIN&quot;</span><br><span class="line"></span><br><span class="line">openssl req -new -subj $SUBJECT -key $DOMAIN.key -out $DOMAIN.csr</span><br><span class="line"></span><br><span class="line">echo &quot;Remove password...&quot;</span><br><span class="line"></span><br><span class="line">mv $DOMAIN.key $DOMAIN.origin.key</span><br><span class="line">openssl rsa -in $DOMAIN.origin.key -out $DOMAIN.key</span><br><span class="line"></span><br><span class="line">echo &quot;Sign SSL certificate...&quot;</span><br><span class="line"></span><br><span class="line">openssl x509 -req -days 3650 -in $DOMAIN.csr -signkey $DOMAIN.key -out $DOMAIN.crt</span><br><span class="line"></span><br><span class="line">echo &quot;TODO:&quot;</span><br><span class="line">echo &quot;Copy $DOMAIN.crt to &#x2F;etc&#x2F;nginx&#x2F;ssl&#x2F;$DOMAIN.crt&quot;</span><br><span class="line">echo &quot;Copy $DOMAIN.key to &#x2F;etc&#x2F;nginx&#x2F;ssl&#x2F;$DOMAIN.key&quot;</span><br><span class="line">echo &quot;Add configuration in nginx:&quot;</span><br><span class="line">echo &quot;server &#123;&quot;</span><br><span class="line">echo &quot;    ...&quot;</span><br><span class="line">echo &quot;    listen 443 ssl;&quot;</span><br><span class="line">echo &quot;    ssl_certificate     &#x2F;etc&#x2F;nginx&#x2F;ssl&#x2F;$DOMAIN.crt;&quot;</span><br><span class="line">echo &quot;    ssl_certificate_key &#x2F;etc&#x2F;nginx&#x2F;ssl&#x2F;$DOMAIN.key;&quot;</span><br><span class="line">echo &quot;&#125;&quot;</span><br></pre></td></tr></table></figure>
+<h3 id="gitlab-https配置"><a href="#gitlab-https配置" class="headerlink" title="gitlab https配置"></a>gitlab https配置</h3><p>以下是与https有关的配置，添加在gitlab.rb里后运行gitlab-ctl reconfigure生效<br>如果gitlab是运行在docker里的，也可以将配置放在docker-compose.yml里，重启容器生效。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">external_url &#39;https:&#x2F;&#x2F;DOMAIN:9898&#x2F;&#39;</span><br><span class="line">nginx[&#39;listen_https&#39;] &#x3D; true</span><br><span class="line">nginx[&#39;listen_port&#39;] &#x3D; 443</span><br><span class="line">nginx[&#39;redirect_http_to_https&#39;] &#x3D; true</span><br><span class="line">nginx[&#39;ssl_certificate&#39;] &#x3D; &quot;&#x2F;etc&#x2F;gitlab&#x2F;ssl&#x2F;DOMAIN.crt&quot;</span><br><span class="line">nginx[&#39;ssl_certificate_key&#39;] &#x3D; &quot;&#x2F;etc&#x2F;gitlab&#x2F;ssl&#x2F;DOMAIN.key&quot;</span><br></pre></td></tr></table></figure>
+
+<h3 id="配置可信证书"><a href="#配置可信证书" class="headerlink" title="配置可信证书"></a>配置可信证书</h3><p>将DOMAIN.crt证书添加到/etc/gitlab/trusted-certs并运行sudo gitlab-ctl reconfigure。</p>
+<h2 id="gitlab-runner配置https"><a href="#gitlab-runner配置https" class="headerlink" title="gitlab-runner配置https"></a>gitlab-runner配置https</h2><h3 id="给runner添加证书"><a href="#给runner添加证书" class="headerlink" title="给runner添加证书"></a>给runner添加证书</h3><h4 id="注意证书rsa秘钥长度最低2048位"><a href="#注意证书rsa秘钥长度最低2048位" class="headerlink" title="注意证书rsa秘钥长度最低2048位"></a>注意证书rsa秘钥长度最低2048位</h4><p>一开始因为rsa的位数只有1024导致注册runner一直提示/api/v4/runners: x509: certificate signed by unknown authority,和没添加证书的提示一样<br>这时候用curl请求<a href="https://domain:9898/%E5%90%8E%E5%8F%91%E7%8E%B0%E9%94%99%E8%AF%AF%E4%BF%A1%E6%81%AF%E4%B8%BAcurl">https://DOMAIN:9898/后发现错误信息为curl</a>: (60) SSL certificate problem: EE certificate key too weak发现是因为生成的rsa私钥长度不够<br>使用2048位的rsa生成的自签证书请求<a href="https://domain:9898/%E8%BF%99%E6%97%B6%E9%94%99%E8%AF%AF%E4%BF%A1%E6%81%AF%E5%8F%98%E6%88%90curl">https://DOMAIN:9898/这时错误信息变成curl</a>: (60) SSL certificate problem: self signed certificate 现在再执行https runner注册就成功了</p>
+<h3 id="注册https-gitlab-runner"><a href="#注册https-gitlab-runner" class="headerlink" title="注册https gitlab runner"></a>注册https gitlab runner</h3><p>关键点就是加了个<code>--tls-ca-file</code>参数,指向容器内部的证书路径<br>修改一下DOMAIN和TOKEN为自己的信息<br>我用的是树莓派，所以用的是klud/gitlab-runner镜像，官方的是gitlab/gitlab-runner，视情况替换</p>
+<p><a href="https://docs.gitlab.com/runner/configuration/tls-self-signed.html">x509: certificate signed by unknown authority官方解决办法</a></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">docker run --rm -it -v ~&#x2F;docker&#x2F;data&#x2F;gitlab&#x2F;runner:&#x2F;etc&#x2F;gitlab-runner  klud&#x2F;gitlab-runner register \</span><br><span class="line">--non-interactive \</span><br><span class="line">--tls-ca-file&#x3D;&#x2F;etc&#x2F;gitlab-runner&#x2F;DOMAIN.crt \</span><br><span class="line">--executor &quot;docker&quot; \</span><br><span class="line">--docker-image alpine:latest \</span><br><span class="line">--url &quot;https:&#x2F;&#x2F;DOMAIN:9898&#x2F;&quot; \</span><br><span class="line">--registration-token &quot;TOKEN&quot; \</span><br><span class="line">--description &quot;docker-runner&quot; \</span><br><span class="line">--tag-list &quot;docker,raspberry&quot; \</span><br><span class="line">--run-untagged&#x3D;&quot;true&quot; \</span><br><span class="line">--locked&#x3D;&quot;false&quot; \</span><br><span class="line">--access-level&#x3D;&quot;not_protected&quot;</span><br></pre></td></tr></table></figure>
+]]></content>
+      <tags>
+        <tag>树莓派</tag>
+        <tag>gitlab</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>gitlab配置</title>
+    <url>/posts/d2cdc29f.html</url>
+    <content><![CDATA[<h2 id="gitlab配置"><a href="#gitlab配置" class="headerlink" title="gitlab配置"></a>gitlab配置</h2><h4 id="编辑gitlab配置gitlab-rb指定external-url"><a href="#编辑gitlab配置gitlab-rb指定external-url" class="headerlink" title="编辑gitlab配置gitlab.rb指定external_url"></a>编辑gitlab配置gitlab.rb指定external_url</h4><p>如果不配置external_url的话gitlab的仓库地址会是localhost,这样就失去使用的意义了,得事先准备一个解析到gitlab所在服务器ip的域名，如果是内网的话还得做ddns解析,然后端口映射出去，外网域名就直接解析到固定ip，开放对应端口就行<br>官方配置文档</p>
+<blockquote>
+<p><a href="https://docs.gitlab.com/omnibus/settings/configuration.html">https://docs.gitlab.com/omnibus/settings/configuration.html</a></p>
+</blockquote>
+<p>编辑gitlab.rb添加external_url,我这里是docker安装的gitlab,所以文件位置在dockerfile指定的目录</p>
+<p><code>sudo vim /home/pi/docker/data/gitlab/config/gitlab.rb</code></p>
+<p><code>external_url &#39;http://URL:8989&#39;</code></p>
+<p>重新读取配置使配置生效</p>
+<p><code>docker exec -it mydock_gitlab_1 gitlab-ctl reconfigure</code></p>
+<p>这时候项目的git地址已经变成external_url指定的域名了</p>
+<h3 id="gitlab-配置docker镜像加速"><a href="#gitlab-配置docker镜像加速" class="headerlink" title="gitlab 配置docker镜像加速"></a>gitlab 配置docker镜像加速</h3><h4 id="config-toml增加runners-machine配置"><a href="#config-toml增加runners-machine配置" class="headerlink" title="config.toml增加runners.machine配置"></a>config.toml增加runners.machine配置</h4><p>官方配置文档</p>
+<blockquote>
+<p><a href="https://docs.gitlab.com/runner/configuration/autoscale.html#distributed-container-registry-mirroring">https://docs.gitlab.com/runner/configuration/autoscale.html#distributed-container-registry-mirroring</a></p>
+</blockquote>
+<p>注意缩进</p>
+<p><code>sudo vim /home/pi/docker/data/gitlab/runner/config.toml</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[runners.machine]</span><br><span class="line">  MachineOptions &#x3D; [</span><br><span class="line">      &quot;engine-registry-mirror&#x3D;https:&#x2F;&#x2F;URL&quot;</span><br><span class="line">  ]</span><br></pre></td></tr></table></figure>
+]]></content>
+      <tags>
+        <tag>树莓派</tag>
+        <tag>gitlab</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>使用GitLab Ci 自动部署Hexo到GitHub</title>
+    <url>/posts/2fdfbcc8.html</url>
+    <content><![CDATA[<h2 id="废话"><a href="#废话" class="headerlink" title="废话"></a>废话</h2><p>使用GitLab 自动部署到github 省去了在自己电脑上装node的一堆潜在问题，只管写想发就发，户体验极度攀升<br>为啥不直接发布到gitlab pages呢？我的gitlab是部署在树莓派里的，博客发布到gitlab的pages指不定哪天就凉了,还有xss的问题，所以还是发布到github吧</p>
+<h3 id="在gitlab中创建一个私有仓库"><a href="#在gitlab中创建一个私有仓库" class="headerlink" title="在gitlab中创建一个私有仓库"></a>在gitlab中创建一个私有仓库</h3><h3 id="向项目目录下添加私钥"><a href="#向项目目录下添加私钥" class="headerlink" title="向项目目录下添加私钥"></a>向项目目录下添加私钥</h3><h3 id=""><a href="#" class="headerlink" title=""></a></h3><p>将公共ssh密钥添加到您的github<br>将.gitlab-ci.yml添加到您的项目</p>
+<h3 id="-1"><a href="#-1" class="headerlink" title=""></a></h3><p>private_key是私钥<br>,hexo-generator-searchdb,用于生成网站搜索功能<br>,hexo-abbrlink –save这个是生成唯一永久文章链接用的,这些都需要相应的在hexo中配置才能生效<br>推送您的更改并查看结果:)</p>
+<h2 id="gitlab-ci-yml"><a href="#gitlab-ci-yml" class="headerlink" title=".gitlab-ci.yml"></a>.gitlab-ci.yml</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">image: node:lts-alpine</span><br><span class="line">cache:</span><br><span class="line">  paths:</span><br><span class="line">    - node_modules&#x2F;</span><br><span class="line"></span><br><span class="line">before_script:</span><br><span class="line">  - npm config set registry https:&#x2F;&#x2F;registry.npm.taobao.org&#x2F;</span><br><span class="line">  - npm install hexo-cli -g</span><br><span class="line">  - npm install hexo-generator-searchdb --save</span><br><span class="line">  - npm install hexo-abbrlink --save</span><br><span class="line">  - npm install hexo-deployer-git --save</span><br><span class="line">  - npm install</span><br><span class="line">  - sed -i &#39;s&#x2F;dl-cdn.alpinelinux.org&#x2F;mirrors.aliyun.com&#x2F;g&#39; &#x2F;etc&#x2F;apk&#x2F;repositories</span><br><span class="line">  - apk --update add openssh-client</span><br><span class="line">  - apk --update add git</span><br><span class="line">  - eval $(ssh-agent -s)</span><br><span class="line">  - chmod 700 private_key</span><br><span class="line">  - ssh-add private_key</span><br><span class="line">  - git config --global user.email &quot;xxxx@xx.com&quot;</span><br><span class="line">  - git config --global user.name &quot;xxxx&quot;</span><br><span class="line">  - echo StrictHostKeyChecking no &gt;&gt; &#x2F;etc&#x2F;ssh&#x2F;ssh_config</span><br><span class="line"></span><br><span class="line">pages:</span><br><span class="line">  script:</span><br><span class="line">    - hexo generate --deploy</span><br><span class="line">  artifacts:</span><br><span class="line">    expire_in: 1 day</span><br><span class="line">    paths:</span><br><span class="line">      - public</span><br><span class="line">  only:</span><br><span class="line">    - master</span><br></pre></td></tr></table></figure>
+]]></content>
+      <tags>
+        <tag>树莓派</tag>
+        <tag>gitlab</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>树莓派 arm docker部署 gitlab gitlab-runner</title>
+    <url>/posts/d7a91ad8.html</url>
+    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>想学习了解一下ci/cd，但是windows下的gitlab和postgresql的volumes没法直接映射到宿主机，干脆就弄了个树莓派玩玩</p>
+<h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><h3 id="安装Raspberry"><a href="#安装Raspberry" class="headerlink" title="安装Raspberry"></a>安装Raspberry</h3><p>树莓派4b 8g内存版，安装Raspberry Pi OS<br>官方下载地址，因为当服务器不需要桌面，我这里下载的是 Raspberry Pi OS (32-bit) Lite</p>
+<blockquote>
+<p><a href="https://www.raspberrypi.org/downloads/raspberry-pi-os/">https://www.raspberrypi.org/downloads/raspberry-pi-os/</a></p>
+</blockquote>
+<p>用rufus将系统烧入sd卡</p>
+<blockquote>
+<p><a href="https://rufus.ie/">https://rufus.ie/</a></p>
+</blockquote>
+<h3 id="安装docker和docker-composer"><a href="#安装docker和docker-composer" class="headerlink" title="安装docker和docker-composer"></a>安装docker和docker-composer</h3><blockquote>
+<p><a href="http://blog.jbface.com/posts/f61bf40.html">http://blog.jbface.com/posts/f61bf40.html</a></p>
+</blockquote>
+<h3 id="获取gitlab-runner镜像"><a href="#获取gitlab-runner镜像" class="headerlink" title="获取gitlab,runner镜像"></a>获取gitlab,runner镜像</h3><p>gitlab,gitlab-runner官方docker镜像没有arm版这里用的是第三方编译的arm docker镜像</p>
+<blockquote>
+<p><a href="https://github.com/ulm0/gitlab">https://github.com/ulm0/gitlab</a><br><a href="https://github.com/ulm0/gitlab-runner">https://github.com/ulm0/gitlab-runner</a></p>
+</blockquote>
+<h2 id="开始"><a href="#开始" class="headerlink" title="开始"></a>开始</h2><p>这里参考的是lardock的dockfile写出来的配置<br>只需要gitlab,gitlab-runner,redis,postgres</p>
+<blockquote>
+<p><a href="https://github.com/wdnb/dnmp">https://github.com/wdnb/dnmp</a></p>
+</blockquote>
+<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><h3 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h3><p>docker-composer up</p>
+<h3 id="获取Runner的URL和token"><a href="#获取Runner的URL和token" class="headerlink" title="获取Runner的URL和token"></a>获取Runner的URL和token</h3><p>这里需要先进入gitlab的管理中心获取Runner的URL和token</p>
+<blockquote>
+<p><a href="http://url:8989/admin/runners">http://URL:8989/admin/runners</a></p>
+</blockquote>
+<p>默认用户是root,初始密码是配置在dnmp项目的env里的GITLAB_ROOT_PASSWORD,可以进入gitlab后修改</p>
+<h3 id="注册runner"><a href="#注册runner" class="headerlink" title="注册runner"></a>注册runner</h3><p>gitlab-runner运行会提示：<br>ERROR: Failed to load config stat /etc/gitlab-runner/config.toml: no such fi<br>这是因为还没注册注册runner<br>官方runner注册文档</p>
+<blockquote>
+<p><a href="https://docs.gitlab.com/runner/register/">https://docs.gitlab.com/runner/register/</a></p>
+</blockquote>
+<p>根据镜像volume挂载方式的不同 local system volume mounts和Docker volume mounts 注册指令有一点点区别，我这里用的是local system volume mounts，不然我还弄锤子树莓派。<br>/srv/gitlab/runner指的是dockerfile里配置里宿主机的gitlab-runner配置目录，指令执行完成后生成的config.toml会存放到这个目录下，填入上面获取的url和registration-token进行注册</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">docker run --rm -it -v &#x2F;srv&#x2F;gitlab&#x2F;runner:&#x2F;etc&#x2F;gitlab-runner  klud&#x2F;gitlab-runner register \</span><br><span class="line">--non-interactive \</span><br><span class="line">--executor &quot;docker&quot; \</span><br><span class="line">--docker-image alpine:latest \</span><br><span class="line">--url &quot;http:&#x2F;&#x2F;URL&quot; \</span><br><span class="line">--registration-token &quot;PROJECT_REGISTRATION_TOKEN&quot; \</span><br><span class="line">--description &quot;docker-runner&quot; \</span><br><span class="line">--tag-list &quot;docker,aws&quot; \</span><br><span class="line">--run-untagged&#x3D;&quot;true&quot; \</span><br><span class="line">--locked&#x3D;&quot;false&quot; \</span><br><span class="line">--access-level&#x3D;&quot;not_protected&quot;</span><br></pre></td></tr></table></figure>
+<h2 id="查看注册信息"><a href="#查看注册信息" class="headerlink" title="查看注册信息"></a>查看注册信息</h2><p><code>sudo cat /home/pi/docker/data/gitlab/runner/config.toml</code></p>
+<h2 id="gitlab配置"><a href="#gitlab配置" class="headerlink" title="gitlab配置"></a>gitlab配置</h2><p>安装完毕后还有一些配置的调优参考这里</p>
+<blockquote>
+<p><a href="https://blog.jbface.com/posts/d2cdc29f.html">https://blog.jbface.com/posts/d2cdc29f.html</a></p>
+</blockquote>
+]]></content>
+      <tags>
+        <tag>树莓派</tag>
+        <tag>gitlab</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>k3s配置</title>
+    <url>/posts/752b168e.html</url>
+    <content><![CDATA[<h2 id="kubectl-指令"><a href="#kubectl-指令" class="headerlink" title="kubectl 指令"></a>kubectl 指令</h2><h3 id="查看k3s节点"><a href="#查看k3s节点" class="headerlink" title="查看k3s节点"></a>查看k3s节点</h3><p><code>sudo k3s kubectl get nodes</code></p>
+<h3 id="查看k3s节点详细"><a href="#查看k3s节点详细" class="headerlink" title="查看k3s节点详细"></a>查看k3s节点详细</h3><p><code>kubectl get nodes -o wide</code></p>
+<h3 id="查看所有namespace"><a href="#查看所有namespace" class="headerlink" title="查看所有namespace"></a>查看所有namespace</h3><p><code>kubectl get pods --all-namespaces</code></p>
+<h3 id="删除-namespace"><a href="#删除-namespace" class="headerlink" title="删除 namespace"></a>删除 namespace</h3><p><code>kubectl delete namespaces cattle-system</code></p>
+<h2 id="helm-指令"><a href="#helm-指令" class="headerlink" title="helm 指令"></a>helm 指令</h2><h2 id="k3s指令"><a href="#k3s指令" class="headerlink" title="k3s指令"></a>k3s指令</h2><h3 id="重启k3s"><a href="#重启k3s" class="headerlink" title="重启k3s"></a>重启k3s</h3><p><code>sudo systemctl restart k3s</code></p>
+<h3 id="卸载k3s"><a href="#卸载k3s" class="headerlink" title="卸载k3s"></a>卸载k3s</h3><p><code>/usr/local/bin/k3s-uninstall.sh (or as k3s-agent-uninstall.sh)</code></p>
+<h2 id="树莓派安装k3s前准备配置"><a href="#树莓派安装k3s前准备配置" class="headerlink" title="树莓派安装k3s前准备配置"></a>树莓派安装k3s前准备配置</h2><h3 id="Raspbian-Buster-需要使用-legacy-iptables"><a href="#Raspbian-Buster-需要使用-legacy-iptables" class="headerlink" title="Raspbian Buster 需要使用 legacy iptables"></a>Raspbian Buster 需要使用 legacy iptables</h3><p>参考官方文档进行操作</p>
+<blockquote>
+<p><a href="https://rancher.com/docs/k3s/latest/en/advanced/#enabling-legacy-iptables-on-raspbian-buster">https://rancher.com/docs/k3s/latest/en/advanced/#enabling-legacy-iptables-on-raspbian-buster</a></p>
+</blockquote>
+<p>Could not set up iptables canary mangle/KUBE-KUBELET-CANARY: error creating chain “KUBE-KUBELET-CANARY”: exit status 3: iptables v1.8.3 (legacy): can’t initialize iptables table `mangle’: Table does not exist (do you need to insmod?)</p>
+<h2 id="修改树莓派主机名"><a href="#修改树莓派主机名" class="headerlink" title="修改树莓派主机名"></a>修改树莓派主机名</h2><p>所有节点不能具有相同的主机名</p>
+<blockquote>
+<p><a href="https://blog.jbface.com/posts/cfe260ea.html#%E6%B7%BB%E5%8A%A0hosts%E5%9F%9F%E5%90%8D%E5%92%8Cip%E5%AF%B9%E5%BA%94%E5%85%B3%E7%B3%BB">https://blog.jbface.com/posts/cfe260ea.html#%E6%B7%BB%E5%8A%A0hosts%E5%9F%9F%E5%90%8D%E5%92%8Cip%E5%AF%B9%E5%BA%94%E5%85%B3%E7%B3%BB</a></p>
+</blockquote>
+<h3 id="cgroup设置"><a href="#cgroup设置" class="headerlink" title="cgroup设置"></a>cgroup设置</h3><p>Jul 27 14:55:53 raspberrypi k3s[849]: time=”2020-07-27T14:55:53.565642894+01:00” level=error msg=”Failed to find memory cgroup, you may need to add &quot;cgroup_memory=1 cgroup_enable=memory&quot; to your linux cmdline (/boot/cmdline.txt on a Raspberry Pi)”</p>
+<h4 id="编辑-boot-cmdline-txt"><a href="#编辑-boot-cmdline-txt" class="headerlink" title="编辑/boot/cmdline.txt"></a>编辑/boot/cmdline.txt</h4><p><code>sudo vim /boot/cmdline.txt</code> 增加 cgroup_memory=1 cgroup_enable=memory 并重启系统</p>
+<p><code>cat /proc/cmdline | grep cgroup_memory</code> 看是否有cgroup_memory字段</p>
+<p><code>cat /proc/self/cgroup</code> 看有没有memory 字段</p>
+<p>这里注意！当前时间：2020/07/27<br>树莓派3b用的Raspbian不支持内存 cgroup<br>参照这个issue</p>
+<blockquote>
+<p><a href="https://github.com/raspberrypi/linux/issues/3644">https://github.com/raspberrypi/linux/issues/3644</a></p>
+</blockquote>
+<p>用老版内核解决</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">wget http:&#x2F;&#x2F;archive.raspberrypi.org&#x2F;debian&#x2F;pool&#x2F;main&#x2F;r&#x2F;raspberrypi-firmware&#x2F;raspberrypi-bootloader_1.20200601-1_armhf.deb</span><br><span class="line">wget http:&#x2F;&#x2F;archive.raspberrypi.org&#x2F;debian&#x2F;pool&#x2F;main&#x2F;r&#x2F;raspberrypi-firmware&#x2F;raspberrypi-kernel_1.20200601-1_armhf.deb</span><br><span class="line">wget http:&#x2F;&#x2F;archive.raspberrypi.org&#x2F;debian&#x2F;pool&#x2F;main&#x2F;r&#x2F;raspberrypi-firmware&#x2F;libraspberrypi-bin_1.20200601-1_armhf.deb</span><br><span class="line">wget http:&#x2F;&#x2F;archive.raspberrypi.org&#x2F;debian&#x2F;pool&#x2F;main&#x2F;r&#x2F;raspberrypi-firmware&#x2F;libraspberrypi-dev_1.20200601-1_armhf.deb</span><br><span class="line">wget http:&#x2F;&#x2F;archive.raspberrypi.org&#x2F;debian&#x2F;pool&#x2F;main&#x2F;r&#x2F;raspberrypi-firmware&#x2F;libraspberrypi-doc_1.20200601-1_armhf.deb</span><br><span class="line">wget http:&#x2F;&#x2F;archive.raspberrypi.org&#x2F;debian&#x2F;pool&#x2F;main&#x2F;r&#x2F;raspberrypi-firmware&#x2F;libraspberrypi0_1.20200601-1_armhf.deb</span><br><span class="line">sudo dpkg -i *deb</span><br></pre></td></tr></table></figure>
+
+<h3 id="执行kubectl时加载配置文件-etc-rancher-k3s-k3s-yaml-时没有权限"><a href="#执行kubectl时加载配置文件-etc-rancher-k3s-k3s-yaml-时没有权限" class="headerlink" title="执行kubectl时加载配置文件 /etc/rancher/k3s/k3s.yaml 时没有权限"></a>执行kubectl时加载配置文件 /etc/rancher/k3s/k3s.yaml 时没有权限</h3><p>WARN[2020-07-26T10:27:21.868999680+01:00] Unable to read /etc/rancher/k3s/k3s.yaml, please start server with –write-kubeconfig-mode to modify kube config permissions </p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo su</span><br><span class="line">echo &quot;K3S_KUBECONFIG_MODE&#x3D;\&quot;644\&quot;&quot; &gt;&gt; &#x2F;etc&#x2F;systemd&#x2F;system&#x2F;k3s.service.env</span><br><span class="line">sudo systemctl restart k3s</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="helm-install-报错-Error-Kubernetes-cluster-unreachable"><a href="#helm-install-报错-Error-Kubernetes-cluster-unreachable" class="headerlink" title="helm install 报错 Error: Kubernetes cluster unreachable"></a>helm install 报错 Error: Kubernetes cluster unreachable</h3><p>执行<br><code>export KUBECONFIG=/etc/rancher/k3s/k3s.yaml</code></p>
+<h2 id="Inbound-Rules-for-K3s-Server-Nodes"><a href="#Inbound-Rules-for-K3s-Server-Nodes" class="headerlink" title="Inbound Rules for K3s Server Nodes"></a>Inbound Rules for K3s Server Nodes</h2><table>
+<thead>
+<tr>
+<th>PROTOCOL</th>
+<th>PORT</th>
+<th>SOURCE</th>
+<th>DESCRIPTION</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>TCP</td>
+<td>6443</td>
+<td>K3s agent nodes</td>
+<td>Kubernetes API</td>
+</tr>
+<tr>
+<td>UDP</td>
+<td>8472</td>
+<td>K3s server and agent nodes</td>
+<td>Required only for Flannel VXLAN</td>
+</tr>
+<tr>
+<td>TCP</td>
+<td>10250</td>
+<td>K3s server and agent nodes</td>
+<td>kubelet</td>
+</tr>
+</tbody></table>
+<h2 id="设置国内加速镜像"><a href="#设置国内加速镜像" class="headerlink" title="设置国内加速镜像"></a>设置国内加速镜像</h2><h3 id="查看镜像信息"><a href="#查看镜像信息" class="headerlink" title="查看镜像信息"></a>查看镜像信息</h3><p><code>crictl info | grep registry</code></p>
+<p>k3s 会在目录 /var/lib/rancher/k3s/agent/etc/containerd 下创建一个 config.toml 文件作为 containerd 的配置文件，我们要做的就是，在同目录下把这个文件复制出来一个 config.toml.tmpl 文件，然后添加镜像源相关的配置进去</p>
+<p><code>sudo cp /var/lib/rancher/k3s/agent/etc/containerd/config.toml /var/lib/rancher/k3s/agent/etc/containerd/config.toml.tmpl</code><br><code>sudo vim /var/lib/rancher/k3s/agent/etc/containerd/config.toml.tmpl</code></p>
+<h3 id="在-config-toml-tmpl-文件中添加"><a href="#在-config-toml-tmpl-文件中添加" class="headerlink" title="在 config.toml.tmpl 文件中添加"></a>在 config.toml.tmpl 文件中添加</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[plugins.cri.registry.mirrors]</span><br><span class="line">  [plugins.cri.registry.mirrors.&quot;docker.io&quot;]</span><br><span class="line">    endpoint &#x3D; [&quot;https:&#x2F;&#x2F;docker.mirrors.ustc.edu.cn&quot;]</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="重启服务"><a href="#重启服务" class="headerlink" title="重启服务"></a>重启服务</h3><p>重启后生效<br><code>systemctl restart k3s</code></p>
+]]></content>
+      <tags>
+        <tag>树莓派</tag>
+        <tag>k3s</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>在 GitLab 项目中使用 k3s Kubernetes 集群</title>
+    <url>/posts/e2c6066f.html</url>
+    <content><![CDATA[<p>参考这篇文章，比较全面</p>
+<blockquote>
+<p><a href="https://medium.com/better-programming/using-a-k3s-kubernetes-cluster-for-your-gitlab-project-b0b035c291a9">https://medium.com/better-programming/using-a-k3s-kubernetes-cluster-for-your-gitlab-project-b0b035c291a9</a></p>
+</blockquote>
+<h2 id="获取API-URL"><a href="#获取API-URL" class="headerlink" title="获取API URL"></a>获取API URL</h2><p>默认的是<a href="https://127.0.0.1:6443/">https://127.0.0.1:6443</a> 可以选择把端口映射到外网</p>
+<h2 id="获取Cluster’s-CA-certificate"><a href="#获取Cluster’s-CA-certificate" class="headerlink" title="获取Cluster’s CA certificate"></a>获取Cluster’s CA certificate</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">kubectl config view --raw \</span><br><span class="line">-o&#x3D;jsonpath&#x3D;&#39;&#123;.clusters[0].cluster.certificate-authority-data&#125;&#39; \</span><br><span class="line">| base64 --decode</span><br></pre></td></tr></table></figure>
+<h2 id="获取Service-token"><a href="#获取Service-token" class="headerlink" title="获取Service token"></a>获取Service token</h2><h3 id="创建一个-ServiceAccount，并为其提供集群管理角色"><a href="#创建一个-ServiceAccount，并为其提供集群管理角色" class="headerlink" title="创建一个 ServiceAccount，并为其提供集群管理角色"></a>创建一个 ServiceAccount，并为其提供集群管理角色</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">cat &lt;&lt;EOF | kubectl apply -f -</span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: ServiceAccount</span><br><span class="line">metadata:</span><br><span class="line">  name: gitlab-admin</span><br><span class="line">  namespace: kube-system</span><br><span class="line">---</span><br><span class="line">apiVersion: rbac.authorization.k8s.io&#x2F;v1beta1</span><br><span class="line">kind: ClusterRoleBinding</span><br><span class="line">metadata:</span><br><span class="line">  name: gitlab-admin</span><br><span class="line">roleRef:</span><br><span class="line">  apiGroup: rbac.authorization.k8s.io</span><br><span class="line">  kind: ClusterRole</span><br><span class="line">  name: cluster-admin</span><br><span class="line">subjects:</span><br><span class="line">- kind: ServiceAccount</span><br><span class="line">  name: gitlab-admin</span><br><span class="line">  namespace: kube-system</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
+<h3 id="往环境变量添加-SECRET"><a href="#往环境变量添加-SECRET" class="headerlink" title="往环境变量添加 SECRET"></a>往环境变量添加 SECRET</h3><p><code>SECRET=$(kubectl -n kube-system get secret | grep gitlab-admin | awk &#39;&#123;print $1&#125;&#39;)</code></p>
+<h3 id="往环境变量添加-TOKEN-并且-提取与-SECRET-关联的-JWT-令牌"><a href="#往环境变量添加-TOKEN-并且-提取与-SECRET-关联的-JWT-令牌" class="headerlink" title="往环境变量添加 TOKEN 并且 提取与 SECRET 关联的 JWT 令牌:"></a>往环境变量添加 TOKEN 并且 提取与 SECRET 关联的 JWT 令牌:</h3><p><code>TOKEN=$(kubectl -n kube-system get secret $SECRET -o jsonpath=&#39;&#123;.data.token&#125;&#39; | base64 --decode)</code><br><code>echo $TOKEN</code></p>
+<h2 id="现在我们使用所有的信息并填写-GitLab-的-Add-existing-cluster-表单"><a href="#现在我们使用所有的信息并填写-GitLab-的-Add-existing-cluster-表单" class="headerlink" title="现在我们使用所有的信息并填写 GitLab 的 Add existing cluster 表单"></a>现在我们使用所有的信息并填写 GitLab 的 Add existing cluster 表单</h2>]]></content>
+      <tags>
+        <tag>树莓派</tag>
+        <tag>gitlab</tag>
+        <tag>k3s</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>树莓派k3s安装rancher</title>
+    <url>/posts/bcb80c6b.html</url>
+    <content><![CDATA[<h2 id="安装helm"><a href="#安装helm" class="headerlink" title="安装helm"></a>安装helm</h2><p>下载官方安装包 ，注意区分helm3 和helm2</p>
+<blockquote>
+<p><a href="https://github.com/helm/helm/releases">https://github.com/helm/helm/releases</a></p>
+</blockquote>
+<p>解压 <code>tar -zxvf helm-xxx.tgz</code></p>
+<p>移动目录 <code>sudo mv helm /usr/local/bin/</code></p>
+<h3 id="添加heml-chart仓库"><a href="#添加heml-chart仓库" class="headerlink" title="添加heml chart仓库"></a>添加heml chart仓库</h3><p><code>helm repo add rancher-stable http://rancher-mirror.oss-cn-beijing.aliyuncs.com/server-charts/stable</code></p>
+<h2 id="安装-cert-manager"><a href="#安装-cert-manager" class="headerlink" title="安装 cert-manager"></a>安装 cert-manager</h2><p>官方文档</p>
+<blockquote>
+<p><a href="https://cert-manager.io/docs/installation/kubernetes/#installing-with-helm">https://cert-manager.io/docs/installation/kubernetes/#installing-with-helm</a></p>
+</blockquote>
+<h3 id="安装-CustomResourceDefinition-资源"><a href="#安装-CustomResourceDefinition-资源" class="headerlink" title="安装 CustomResourceDefinition 资源"></a>安装 CustomResourceDefinition 资源</h3><p><code>kubectl apply --validate=false -f cert-manager.crds.yaml</code></p>
+<h3 id="为-cert-manager-创建命名空间"><a href="#为-cert-manager-创建命名空间" class="headerlink" title="为 cert-manager 创建命名空间"></a>为 cert-manager 创建命名空间</h3><p><code>kubectl create namespace cert-manager</code></p>
+<h3 id="添加-Jetstack-Helm-仓库"><a href="#添加-Jetstack-Helm-仓库" class="headerlink" title="添加 Jetstack Helm 仓库"></a>添加 Jetstack Helm 仓库</h3><p><code>helm repo add jetstack https://charts.jetstack.io</code></p>
+<h3 id="更新本地-Helm-chart-仓库缓存"><a href="#更新本地-Helm-chart-仓库缓存" class="headerlink" title="更新本地 Helm chart 仓库缓存"></a>更新本地 Helm chart 仓库缓存</h3><p><code>helm repo update</code></p>
+<h3 id="安装-cert-manager-Helm-chart"><a href="#安装-cert-manager-Helm-chart" class="headerlink" title="安装 cert-manager Helm chart"></a>安装 cert-manager Helm chart</h3><p><code>helm install   cert-manager jetstack/cert-manager   --namespace cert-manager   --version v0.16.0</code></p>
+]]></content>
+      <tags>
+        <tag>树莓派</tag>
+        <tag>k3s</tag>
+        <tag>rancher</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>树莓派部署k3s</title>
+    <url>/posts/480df2b4.html</url>
+    <content><![CDATA[<p>硬件设备： 树莓派4b 8g,树莓派3B 1g</p>
+<p>k3s版本： k3s version v1.18.6+k3s1 (6f56fa1d)</p>
+<p>操作系统：</p>
+<p>Linux raspberrypi 5.4.51-v7l+ #1326 SMP Fri Jul 17 10:51:18 BST 2020 armv7l GNU/Linux</p>
+<p>helm: v3.2.4</p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>主要以提供的官方文档为准，指令记录只有关键的流程</p>
+<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p>配置文件会被写到 /etc/systemd/system 下<br><code>sudo vim /etc/systemd/system/k3s.service</code></p>
+<h2 id="查看日志"><a href="#查看日志" class="headerlink" title="查看日志"></a>查看日志</h2><p><code>tail -f /var/log/syslog</code></p>
+<h2 id="前期工作和错误处理"><a href="#前期工作和错误处理" class="headerlink" title="前期工作和错误处理"></a>前期工作和错误处理</h2><blockquote>
+<p><a href="https://blog.jbface.com/posts/752b168e.html">https://blog.jbface.com/posts/752b168e.html</a></p>
+</blockquote>
+<h2 id="k3s部署官方文档"><a href="#k3s部署官方文档" class="headerlink" title="k3s部署官方文档"></a>k3s部署官方文档</h2><blockquote>
+<p><a href="https://rancher2.docs.rancher.cn/docs/installation/k8s-install/_index">https://rancher2.docs.rancher.cn/docs/installation/k8s-install/_index</a></p>
+</blockquote>
+<h3 id="安装-Kubernetes-并配置-K3s-Server"><a href="#安装-Kubernetes-并配置-K3s-Server" class="headerlink" title="安装 Kubernetes 并配置 K3s Server"></a>安装 Kubernetes 并配置 K3s Server</h3><h3 id="安装并且指定外部存储"><a href="#安装并且指定外部存储" class="headerlink" title="安装并且指定外部存储"></a>安装并且指定外部存储</h3><p>官方文档</p>
+<blockquote>
+<p><a href="https://docs.rancher.cn/k3s/installation/datastore.html#_2-2-mysql">https://docs.rancher.cn/k3s/installation/datastore.html#_2-2-mysql</a></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">curl -sfL https:&#x2F;&#x2F;docs.rancher.cn&#x2F;k3s&#x2F;k3s-install.sh | INSTALL_K3S_MIRROR&#x3D;cn sh -s - server \</span><br><span class="line">--datastore-endpoint&#x3D;&quot;mysql:&#x2F;&#x2F;root:123456@tcp(127.0.0.1:3306)&#x2F;kubernetes&quot;</span><br></pre></td></tr></table></figure>
+<p>如果只有mysql://的话 使用root用户名连接到MySQL套接字/var/run/mysqld/mysqld.sock，无需密码并且试图创建一个名为kubernetes的数据库</p>
+<h2 id="跨vps组建集群"><a href="#跨vps组建集群" class="headerlink" title="跨vps组建集群"></a>跨vps组建集群</h2><h3 id="添加master节点配置外网ip和证书ip和数据库"><a href="#添加master节点配置外网ip和证书ip和数据库" class="headerlink" title="添加master节点配置外网ip和证书ip和数据库"></a>添加master节点配置外网ip和证书ip和数据库</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">curl -sfL https:&#x2F;&#x2F;docs.rancher.cn&#x2F;k3s&#x2F;k3s-install.sh | INSTALL_K3S_MIRROR&#x3D;cn sh -s - server --node-external-ip&#x3D;xxx.xxx.xxx.xxx \</span><br><span class="line">--tls-san&#x3D;xxx.xxx.xxx.xxx \</span><br><span class="line">--datastore-endpoint&#x3D;&quot;mysql:&#x2F;&#x2F;root:password@tcp(xxx.xxx.xxx.xxx:3306)&#x2F;kubernetes&quot;</span><br></pre></td></tr></table></figure>
+
+<h3 id="检测是否有EXTERNAL-IP"><a href="#检测是否有EXTERNAL-IP" class="headerlink" title="检测是否有EXTERNAL-IP"></a>检测是否有EXTERNAL-IP</h3><p><code>kubectl get nodes -o wide</code></p>
+<h3 id="获取NODE-TOKEN"><a href="#获取NODE-TOKEN" class="headerlink" title="获取NODE_TOKEN"></a>获取NODE_TOKEN</h3><p><code>cat /var/lib/rancher/k3s/server/node-token</code></p>
+<h3 id="添加slave节点并且连接到外网master"><a href="#添加slave节点并且连接到外网master" class="headerlink" title="添加slave节点并且连接到外网master"></a>添加slave节点并且连接到外网master</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">curl -sfL https:&#x2F;&#x2F;docs.rancher.cn&#x2F;k3s&#x2F;k3s-install.sh | INSTALL_K3S_MIRROR&#x3D;cn sh -s - agent \</span><br><span class="line">--server https:&#x2F;&#x2F;xxx.xxx.xxx.xxx:6443 --token NODE_TOKEN</span><br></pre></td></tr></table></figure>
+
+
+
+]]></content>
+      <tags>
+        <tag>树莓派</tag>
+        <tag>k3s</tag>
+      </tags>
+  </entry>
+</search>

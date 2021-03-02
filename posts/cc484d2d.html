@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="4+1架构视图方法Kruchten 提出了一个”4+1”视图模型，从 5 个不同的视角包括包括逻辑试图、进程视图、物理视图、开发视图、场景视图来描述软件体系结构。每一个视图只关心系统的一个侧面，5 个试图结合在一起才能反映系统的软件体系结构的全部内容。如下图： 逻辑视图（Logic View ）逻辑试图主要是用来描述系统的功能需求 描述系统的功能需求，即系统提供给 最终用户的服务. 在逻辑视图中，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="UML学习笔记">
+<meta property="og:url" content="http://yoursite.com/posts/cc484d2d.html">
+<meta property="og:site_name" content="Faceless Void">
+<meta property="og:description" content="4+1架构视图方法Kruchten 提出了一个”4+1”视图模型，从 5 个不同的视角包括包括逻辑试图、进程视图、物理视图、开发视图、场景视图来描述软件体系结构。每一个视图只关心系统的一个侧面，5 个试图结合在一起才能反映系统的软件体系结构的全部内容。如下图： 逻辑视图（Logic View ）逻辑试图主要是用来描述系统的功能需求 描述系统的功能需求，即系统提供给 最终用户的服务. 在逻辑视图中，">
+<meta property="og:locale">
+<meta property="article:published_time" content="2020-09-20T00:37:22.000Z">
+<meta property="article:modified_time" content="2021-03-02T13:39:12.615Z">
+<meta property="article:author" content="第三选">
+<meta property="article:tag" content="学习笔记">
+<meta property="article:tag" content="UML">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/posts/cc484d2d.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'default'
+  };
+</script>
+
+  <title>UML学习笔记 | Faceless Void</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Faceless Void</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="default">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/posts/cc484d2d.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="第三选">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Faceless Void">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          UML学习笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-09-20 00:37:22" itemprop="dateCreated datePublished" datetime="2020-09-20T00:37:22+00:00">2020-09-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-02 13:39:12" itemprop="dateModified" datetime="2021-03-02T13:39:12+00:00">2021-03-02</time>
+              </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus: </span>
+    
+    <a title="disqus" href="/posts/cc484d2d.html#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="posts/cc484d2d.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="4-1架构视图方法"><a href="#4-1架构视图方法" class="headerlink" title="4+1架构视图方法"></a>4+1架构视图方法</h2><p>Kruchten 提出了一个”4+1”视图模型，从 5 个不同的视角包括包括逻辑试图、进程视图、物理<br>视图、开发视图、场景视图来描述软件体系结构。每一个视图只关心系统的一个侧面，5 个试图<br>结合在一起才能反映系统的软件体系结构的全部内容。如下图：</p>
+<h3 id="逻辑视图（Logic-View-）"><a href="#逻辑视图（Logic-View-）" class="headerlink" title="逻辑视图（Logic View ）"></a>逻辑视图（Logic View ）</h3><p>逻辑试图主要是用来描述系统的功能需求 描述系统的功能需求，即系统提供给 最终用户的服务. 在逻辑视图中，<br>系统分解成一系列的功能抽象、功能分解与功能分析，这些主要来自问题领域（Problem Definition)。<br>在面向对象技术中，通过抽象、封装、继承,可以用对象模型来代表逻辑视图，可以用类图（Class<br>Diagram）来描述逻辑视图。如下图:<br>构件(Components)：类、类服务、参数化类、类层次<br>连接件(Connectors)：关联、包含聚集、使用、继承、实例化</p>
+<h3 id="开发视图（Development-Module-View"><a href="#开发视图（Development-Module-View" class="headerlink" title="开发视图（Development/Module View)"></a>开发视图（Development/Module View)</h3><p>开发视图主要用来描述软件模块的组织与管理 描述软件模块的组织与管理（通过程序库或子系统）。服务于软件 编程人<br>员， 方便后续的设计与实现。它通过系统输入输出关系的模型图和子系统图来描述。要考虑软<br>件的内部需求：开发的难易程度、重用的可能性，通用性，局限性等等。开发视图的风格通常是<br>层次结构，层次越低，通用性越好（底层库：Java SDK，图像处理软件包）。如下图: 构件：模块、<br>子系统、层 连接件：参照相关性、模块/过程调用</p>
+<h3 id="进程视图（Process-View）"><a href="#进程视图（Process-View）" class="headerlink" title="进程视图（Process View）"></a>进程视图（Process View）</h3><p>进程试图侧重系统的 运行特性，关注非功能性的需求（性能，可用性）。服务于 系统集成人<br>员，方便后续性能测试。强调并发性、分布性、集成性、鲁棒性（容错）、可扩充性、吞吐量等。<br>定义逻辑视图中的各个类的具体操作是在哪一个线程（Thread）中被执行。<br>如下图: 构件：进程、简化进程、循环进程<br>连接件：未指定，消息、远程过程调用（RPC）、双向消息、事件广播</p>
+<h3 id="物理视图（Physical-View）"><a href="#物理视图（Physical-View）" class="headerlink" title="物理视图（Physical View）"></a>物理视图（Physical View）</h3><p>物理试图主要描述硬件配置 描述硬件配置。服务于 系统工程人员，解决系统的拓扑结构、系统安装、通信<br>等问题。主要考虑如何把软件映射到硬件上，也要考虑系统性能、规模、可靠性等。可以与进程<br>视图一起映射。如下图:<br>构件：处理器、计算机、其它设备<br>连接件：通信协议等</p>
+<h3 id="场景-Scenarios"><a href="#场景-Scenarios" class="headerlink" title="场景(Scenarios)"></a>场景(Scenarios)</h3><p>场景用于刻画构件之间的相互关系 刻画构件之间的相互关系，将四个视图有机地联系起来。可以描述一个特定的视图<br>内的构件关系，也可以描述不同视图间的构件关系。文本、图形表示皆可。</p>
+<h2 id="UML"><a href="#UML" class="headerlink" title="UML"></a>UML</h2><h3 id="什么是UML"><a href="#什么是UML" class="headerlink" title="什么是UML"></a>什么是UML</h3><p>UML是面向对象设计的建模工具，独立于任何具体程序设计语言。</p>
+<h3 id="UML的作用"><a href="#UML的作用" class="headerlink" title="UML的作用"></a>UML的作用</h3><p>UML用于帮助系统开发人员阐明，展示，构建和记录软件系统的产出<br>UML主要使用图形符号来表示软件项目的设计，使用UML可以帮助项目团队沟通、探索潜在的设计和验证软件的架构设计</p>
+<h3 id="UML静态图分类"><a href="#UML静态图分类" class="headerlink" title="UML静态图分类"></a>UML静态图分类</h3><ul>
+<li><strong>用例图 （ use case diagram ）</strong></li>
+<li><strong>类图（class diagram ）</strong></li>
+<li>组件图 （ component diagram ）</li>
+<li>部署图 （ deployment diagram ）</li>
+<li><del>对象图 （ object diagram ）</del></li>
+<li><del>包图（ package diagram ）</del></li>
+</ul>
+<h3 id="UML动态图分类"><a href="#UML动态图分类" class="headerlink" title="UML动态图分类"></a>UML动态图分类</h3><ul>
+<li><strong>序列图 （sequence diagram ）</strong></li>
+<li>活动图 （ activity diagram ）</li>
+<li>状态图 （ state diagram ）</li>
+<li><del>协作图（ collaboration diagram ）</del></li>
+</ul>
+<h3 id="UML使用注意点"><a href="#UML使用注意点" class="headerlink" title="UML使用注意点"></a>UML使用注意点</h3><p>将UML作为系统蓝图进行设计的时候，1：设计结果必须够完整，做出所有的设计决策，让开发人员不太需要思考，就可以用很直观的方式遵循蓝图写出程序，2：子系统容易有业务上的变更以及设计上的变更发生，所以设计的时候需要提前了解系统哪些部分容易受到需求影响而修改，从而将子系统中容易变动的部分和不易变的部分隔离开</p>
+<h3 id="类图详解"><a href="#类图详解" class="headerlink" title="类图详解"></a>类图详解</h3><p>类图是一种静态UML图，它的应用范围最广，类图用于描述系统中的对象类型，以及存在于它们之间的各种静态关系</p>
+<h3 id="组件图详解"><a href="#组件图详解" class="headerlink" title="组件图详解"></a>组件图详解</h3><p>组件图将正在开发的实际系统分解为各种高级功能。每个组成部分在整个系统中负责一个明确的目标，并且只在需要知道的基础上与其他基本要素相互作用。</p>
+<h4 id="组件符号"><a href="#组件符号" class="headerlink" title="组件符号"></a>组件符号</h4><p>可以在右上角矩形中的小矩形中包含其类型，其中可以包含两个或更多的小矩形。</p>
+<p>需求接口（半圈/插座）代表依赖或必需接口<br>提供接口（圆圈/棒棒糖）表示实现或提供的接口</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="tag"># 学习笔记</a>
+              <a href="/tags/UML/" rel="tag"># UML</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/1a5a0bd0.html" rel="prev" title="gitlab和gitlab-runner配置 https 自签证书">
+      <i class="fa fa-chevron-left"></i> gitlab和gitlab-runner配置 https 自签证书
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/b96906ea.html" rel="next" title="食堂就餐卡系统设计">
+      食堂就餐卡系统设计 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#4-1%E6%9E%B6%E6%9E%84%E8%A7%86%E5%9B%BE%E6%96%B9%E6%B3%95"><span class="nav-number">1.</span> <span class="nav-text">4+1架构视图方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%BB%E8%BE%91%E8%A7%86%E5%9B%BE%EF%BC%88Logic-View-%EF%BC%89"><span class="nav-number">1.1.</span> <span class="nav-text">逻辑视图（Logic View ）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%80%E5%8F%91%E8%A7%86%E5%9B%BE%EF%BC%88Development-Module-View"><span class="nav-number">1.2.</span> <span class="nav-text">开发视图（Development&#x2F;Module View)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E8%A7%86%E5%9B%BE%EF%BC%88Process-View%EF%BC%89"><span class="nav-number">1.3.</span> <span class="nav-text">进程视图（Process View）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%A9%E7%90%86%E8%A7%86%E5%9B%BE%EF%BC%88Physical-View%EF%BC%89"><span class="nav-number">1.4.</span> <span class="nav-text">物理视图（Physical View）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF-Scenarios"><span class="nav-number">1.5.</span> <span class="nav-text">场景(Scenarios)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UML"><span class="nav-number">2.</span> <span class="nav-text">UML</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFUML"><span class="nav-number">2.1.</span> <span class="nav-text">什么是UML</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#UML%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="nav-number">2.2.</span> <span class="nav-text">UML的作用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#UML%E9%9D%99%E6%80%81%E5%9B%BE%E5%88%86%E7%B1%BB"><span class="nav-number">2.3.</span> <span class="nav-text">UML静态图分类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#UML%E5%8A%A8%E6%80%81%E5%9B%BE%E5%88%86%E7%B1%BB"><span class="nav-number">2.4.</span> <span class="nav-text">UML动态图分类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#UML%E4%BD%BF%E7%94%A8%E6%B3%A8%E6%84%8F%E7%82%B9"><span class="nav-number">2.5.</span> <span class="nav-text">UML使用注意点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B1%BB%E5%9B%BE%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.6.</span> <span class="nav-text">类图详解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%84%E4%BB%B6%E5%9B%BE%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.7.</span> <span class="nav-text">组件图详解</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BB%84%E4%BB%B6%E7%AC%A6%E5%8F%B7"><span class="nav-number">2.7.1.</span> <span class="nav-text">组件符号</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">第三选</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">69</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">32</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">第三选</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://blog-kh2xumfqa3.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://yoursite.com/posts/cc484d2d.html";
+    this.page.identifier = "posts/cc484d2d.html";
+    this.page.title = "UML学习笔记";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://blog-kh2xumfqa3.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>
